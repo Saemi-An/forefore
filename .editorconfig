@@ -1,0 +1,19 @@
+root = true
+
+[*.py]
+charset = utf-8
+indent_size = 4
+indent_style = space
+max_line_length = 119   # 한 줄에 작성할 수 있는 최대 문자 수
+
+[*.html]
+charset = utf-8
+indent_size = 2
+indent_style = space
+max_line_length = 119   # 한 줄에 작성할 수 있는 최대 문자 수
+
+[*.css]
+charset = utf-8
+indent_size = 2
+indent_style = space
+max_line_length = 119   # 한 줄에 작성할 수 있는 최대 문자 수
