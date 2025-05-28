@@ -12,7 +12,8 @@ dependencies = [
     "django (>=5.2.1,<6.0.0)",
     "psycopg2 (>=2.9.10,<3.0.0)",
     "django-split-settings (>=1.3.2,<2.0.0)",
-    "pyyaml (>=6.0.2,<7.0.0)"
+    "pyyaml (>=6.0.2,<7.0.0)",
+    "pillow (>=11.2.1,<12.0.0)"
 ]
 
 [tool.isort]
@@ -25,6 +26,10 @@ align_closing_bracket_with_visual_indent = true
 coalesce_brackets = true
 column_limit = 119
 dedent_closing_brackets = true
+
+# mypy가 migrations 하위는 검사하지 않도록 설정
+[tool.mypy]
+exclude = "core/.*/migrations/.*"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

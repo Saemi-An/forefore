@@ -11,6 +11,11 @@ lint:
 install-pre-commit:
 	poetry run pre-commit uninstall; poetry run pre-commit install
 
+# 
+.PHONY: clean-lint
+clean-lint:
+	poetry run pre-commit clean
+
 # ============================ 장고 ============================
 
 # 개발서버 DB 컨테이너 띄우기 
@@ -22,6 +27,11 @@ up-dependencies-only:
 .PHONY: run
 run:
 	poetry run python -m core.manage runserver
+
+# 쉘 실행
+.PHONY: shell
+shell:
+	poetry run python -m core.manage shell
 
 .PHONY: migrate
 migrate:
