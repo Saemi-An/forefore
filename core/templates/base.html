@@ -1,0 +1,98 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>고도화 진행중</title>
+  <link rel="stylesheet" href="{% static 'styles/style.css'%}">
+  <script src="{% static 'js/base.js' %}" defer></script>
+</head>
+<body>
+  <header class="header align both">
+    <div class="header__left align both">
+      <button class="btn-logo"></button>
+      <span class="header__icon">🍔</span>
+    </div>
+    <div class="header__right align both">
+      <span class="xl-bold-title">페이지 이름</span>
+      <form action="{% url 'logout' %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="header__icon">🙋🏽‍♀️</button>
+      </form>
+    </div>
+  </header>
+  <div class="main-container">
+    <nav class="nav">
+      <div class="nav__section">
+        <div class="nav__section__title align both">
+          <div class="div_with_emoji">
+            <span class="lg-bold emoji_mgb02">💰</span>
+            <span class="md-bold">예약 주문서 관리</span>
+          </div>
+          <span class="lg-bold">📘</span>
+        </div>
+        <ul class="nav__section__title__sub">
+          <li class="nav__section__title__sub-title md-reg">홀케이크 주문서</li>
+          <li class="nav__section__title__sub-title md-reg">구움과자 주문서</li>
+        </ul>
+      </div>
+      <div class="nav__section">
+        <div class="nav__section__title align both">
+          <div class="div_with_emoji">
+            <span class="lg-bold emoji_mgb02">🎂</span>
+            <span class="md-bold">홀케이크</span>
+          </div>
+          <span class="lg-bold">📘</span>
+        </div>
+        <ul class="nav__section__title__sub">
+          <li class="nav__section__title__sub-title md-reg">홀케이크 판매</li>
+          <li class="nav__section__title__sub-title md-reg">홀케이크 옵션</li>
+          <li class="nav__section__title__sub-title md-reg">홀케이크 픽업시간</li>
+        </ul>
+      </div>
+      <div class="nav__section">
+        <div class="nav__section__title align both active">
+          <div class="div_with_emoji">
+            <span class="lg-bold">🍪</span>
+            <span class="md-bold">구움과자</span>
+          </div>
+          <span class="lg-bold">📖</span>
+        </div>
+        <ul class="nav__section__title__sub">
+          <li class="nav__section__title__sub-title active md-reg">구움과자 판매</li>
+          <li class="nav__section__title__sub-title md-reg">구움과자 상품</li>
+          <li class="nav__section__title__sub-title md-reg">구움과자 픽업시간</li>
+        </ul>
+      </div>
+      <div class="nav__section">
+        <div class="nav__section__title align both">
+          <div class="div_with_emoji">
+            <span class="lg-bold emoji_mgb02">📝</span>
+            <span class="md-bold">게시판</span>
+          </div>
+          <span class="lg-bold">📘</span>
+        </div>
+        <ul class="nav__section__title__sub">
+          <li class="nav__section__title__sub-title md-reg">텍스트 배너</li>
+          <li class="nav__section__title__sub-title md-reg">공지사항</li>
+          <li class="nav__section__title__sub-title md-reg">영업일</li>
+        </ul>
+      </div>
+      <div class="nav__section">
+        <div class="nav__section__title align both">
+          <div class="div_with_emoji">
+            <span class="lg-bold emoji_mgt02">👩🏻</span>
+            <span class="md-bold">회원 관리</span>
+          </div>
+          <span class="lg-bold">📘</span>
+        </div>
+      </div>
+    </nav>
+    <main class="main column_24">
+      {% block main %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

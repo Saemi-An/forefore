@@ -5,13 +5,12 @@
 lint:
 	poetry run pre-commit run --all-files
 
-
 # hook에 변경사항이 있을 때 pre-commit 도구를 통해 기존 hook 전체 삭제 및 재다운로드
 .PHONY: install-pre-commit
 install-pre-commit:
 	poetry run pre-commit uninstall; poetry run pre-commit install
 
-# 
+# ?
 .PHONY: clean-lint
 clean-lint:
 	poetry run pre-commit clean
@@ -26,7 +25,7 @@ up-dependencies-only:
 # 개발서버 실행
 .PHONY: run
 run:
-	poetry run python -m core.manage runserver
+	poetry run python -m core.manage runserver 8080
 
 # 쉘 실행
 .PHONY: shell

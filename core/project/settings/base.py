@@ -18,7 +18,18 @@ INSTALLED_APPS = [
 
     # 장고앱
     'core.products.apps.ProductsConfig',
+    'core.accounts.apps.AccountsConfig',
+
+    # 라이브러리
+    'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'core.general.permissions.IsForeforeAdminUser',
+    # ),
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -35,7 +46,7 @@ ROOT_URLCONF = 'core.project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],  # 베이스 템플렛 경로
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -91,6 +102,13 @@ USE_TZ = False
 # 정적 파일
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
 MEDIA_ROOT = BASE_DIR / 'uploads'  # 어드민에서 업로드한 상품 사진들이 저장될 폴더 경로
 
 MEDIA_URL = '/admin_media/'  # 사용자가 브라우저에서 미디어 파일에 접근할 때 URL 경로
+
+# 관리자 로그인
+LOGIN_URL = '/manager/login'
+LOGIN_REDIRECT_URL = '/manager'
+LOGOUT_REDIRECT_URL = '/manager/login'

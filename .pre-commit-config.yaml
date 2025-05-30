@@ -32,4 +32,5 @@ repos:
     rev: 'v0.910'
     hooks:
       - id: mypy
+        # args: [ "--config-file=pyproject.toml" ]
         additional_dependencies: [ types-requests, types-PyYAML==5.4.3, types-toml ]
