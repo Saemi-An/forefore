@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load customtags %}
+
+{% block main %}
+<!-- 검색 섹션 -->
+<section class="paper">
+  <div class="search">
+    <p class="lg-bold">판매 설정</p>
+    <!-- 인풋 -->
+    <div class="search__mid">
+      <div class="search__mid__box">
+        <p class="md-bold">판매 상태</p>
+        <input type="text" class="md-reg search__mid__box no-input" value="{% if sale %}예약 가능{% else %}예약 종료{% endif %}">
+      </div>
+      <div class="search__mid__box">
+        <p class="md-bold">필드 타이틀</p>
+        <input type="text" class="md-reg search__mid__box" value="미리 넣어둔 값">
+        <input type="text" class="md-reg search__mid__box" value="미리 넣어둔 값">
+        <input type="text" class="md-reg search__mid__box" value="미리 넣어둔 값">
+        <input type="text" class="md-reg search__mid__box" value="미리 넣어둔 값">
+      </div>
+    </div>
+    <!-- 버튼 -->
+    <div class="search__btm align right">
+      <button class="emoji-btn green">
+        <div class="div_with_emoji">
+          <span class="md-reg emoji_mgb02">🛍️</span>
+          <span class="md-reg txt-color-white">예약 상태 변경</span>
+        </div>
+      </button>
+      <button class="emoji-btn green">
+        <div class="div_with_emoji">
+          <span class="md-reg emoji_mgb02">⏱️</span>
+          <span class="md-reg txt-color-white">버튼명</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- 테이블 섹션 -->
+<section class="paper">
+  <div class="table">
+    <!-- 상단 -->
+    <div class="align both table__top">
+      <span class="lg-bold">판매 상품 목록</span>
+      <button class="emoji-btn green">
+        <div class="div_with_emoji">
+          <span class="lg-reg emoji_mgb02">✨</span>
+          <span class="md-reg txt-color-white">버튼명</span>
+        </div>
+      </button>
+    </div>
+    <!-- 구움과자 필터 -->
+    <ul class="table__tab">
+      <li><button class="md-reg table__tab__filter active">🍀 전체</button></li>
+      <li><button class="md-reg table__tab__filter">🧈 휘낭시에</button></li>
+      <li><button class="md-reg table__tab__filter">🍰 조각케이크</button></li>
+      <li><button class="md-reg table__tab__filter">🥮 스콘</button></li>
+      <li><button class="md-reg table__tab__filter">🥨 오늘의 메뉴</button></li>
+    </ul>
+    <!-- 중단 -->
+    <table class="table__table">
+      <colgroup>
+        <col style="width: 5%;">  <!-- 순서 -->
+        <col style="width: 7%;">  <!-- 이미지 -->
+        <col style="width: 10%;">  <!-- 상품유형 -->
+        <col style="width: 20%;">  <!-- 상품명 -->
+        <col style="width: 10%;">  <!-- 가격 -->
+
+        <col style="width: 14%;">  <!-- 노출 상태 -->
+        <col style="width: 8%;">  <!-- 잔여 재고 -->
+        <col style="width: 16%;">  <!-- 안전재고 / 전체재고 -->
+
+        <col style="width: 12%;">  <!-- 기능 -->
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="md-bold">순서</th>
+          <th class="md-bold">이미지</th>
+          <th class="md-bold">상품유형</th>
+          <th class="md-bold">상품명</th>
+          <th class="md-bold">가격</th>
+          <th class="md-bold">노출 상태</th>
+          <th class="md-bold">잔여 재고</th>
+          <th class="md-bold">안전재고 / 전체재고</th>
+          <th class="md-bold">기능</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cookie in cookies %}
+        <tr>
+          <td class="md-reg">{{ cookie.index }}</td>
+          <td>
+            <img src="/admin_media/{{ cookie.product.img }}" alt="" class="table__table__img">
+          </td>
+          <td class="md-reg">{{ cookie.product.get_category_display }}</td>
+          <td class="md-reg">{{ cookie.product.name }}</td>
+          <td class="md-reg">{{ cookie.product.price | intcomma}}원</td>
+          <td class="md-reg">
+            {% if cookie.status == 0 %}
+              ⚪️ {{ cookie.get_status_display }}   <!-- 판매 대기중 -->
+              {% elif cookie.status == 1 %}
+              🟢 {{ cookie.get_status_display }}   <!-- 판매중 -->
+              {% elif cookie.status == 2 %}
+              🟡 {{ cookie.get_status_display }}   <!-- 재고 소진 -->
+              {% elif cookie.status == 3 %}
+              ⚫️ {{ cookie.get_status_display }}   <!-- 시즌 종료 -->
+            {% endif %}
+          </td>
+          <td class="md-reg">{{ cookie.current }}</td>
+          <td class="md-reg">{{ cookie.safe }} / {{ cookie.total }}</td>
+          <td class="">
+            <div class="table__table__functions">
+              <button class="lg-reg">👀</button>
+              <button class="lg-reg">✍🏽</button>
+              <button class="lg-reg">🗑️</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <!-- 하단 -->
+    <div class="align center">
+      <ul class="table__paging">
+        <li class="align center"><button class="lg-bold">👈🏽</button></li>
+
+        <li><button class="align center md-reg table__paging__btn">3</button></li>
+        <li><button class="align center md-reg table__paging__btn">4</button></li>
+        <li><button class="align center md-reg table__paging__btn">5</button></li>
+        <li><button class="align center md-reg table__paging__btn active">6</button></li>
+        <li><button class="align center md-reg table__paging__btn">7</button></li>
+        <li><button class="align center md-reg table__paging__btn">8</button></li>
+        <li><button class="align center md-reg table__paging__btn">9</button></li>
+
+        <li class="align center"><button class="lg-bold">👉🏽</button></li>
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

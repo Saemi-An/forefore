@@ -8,23 +8,49 @@
   <title>고도화 진행중</title>
   <link rel="stylesheet" href="{% static 'styles/style.css'%}">
   <script src="{% static 'js/base.js' %}" defer></script>
+  {% block script %}{% endblock %}
 </head>
 <body>
   <header class="header align both">
     <div class="header__left align both">
       <button class="btn-logo"></button>
-      <span class="header__icon">🍔</span>
+      <button class="header__icon" id="hamburgerIcon">🍔</button>
     </div>
     <div class="header__right align both">
-      <span class="xl-bold-title">페이지 이름</span>
+      <span class="xl-bold-title">
+        {% if '/cookies/' in request.path %}
+        구움과자 판매
+        {% elif '/cookies-products/' in request.path %}
+        구움과자 상품
+        {% elif '/cookies-times/' in request.path %}
+        구움과자 픽업시간
+        {% endif %}
+      </span>
       <form action="{% url 'logout' %}" method="POST">
         {% csrf_token %}
         <button type="submit" class="header__icon">🙋🏽‍♀️</button>
       </form>
     </div>
   </header>
+    <!-- 토스트 메세지 -->
+    {% if messages %}
+    <ul class="toast" id="toastUl">
+      {% for msg in messages %}
+      <li class="toast__li {% if msg.tags %}{{ msg.tags }}{% endif %}">
+        {% if msg.tags == 'success' %}
+        <span class="lg-bold">✅</span>
+        <span class="md-bold txt-color-gray09">{{ msg }}</span>
+        {% elif msg.tags == 'error' %}
+        <span class="lg-bold">☹️</span>
+        <span class="md-bold txt-color-gray09">{{ msg }}</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
   <div class="main-container">
-    <nav class="nav">
+    <nav class="nav" id="navPanel">
       <div class="nav__section">
         <div class="nav__section__title align both">
           <div class="div_with_emoji">
@@ -61,9 +87,9 @@
           <span class="lg-bold">📖</span>
         </div>
         <ul class="nav__section__title__sub">
-          <li class="nav__section__title__sub-title active md-reg">구움과자 판매</li>
-          <li class="nav__section__title__sub-title md-reg">구움과자 상품</li>
-          <li class="nav__section__title__sub-title md-reg">구움과자 픽업시간</li>
+          <li class="nav__section__title__sub-title md-reg {% if '/cookies/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies' %}'">구움과자 판매</li>
+          <li class="nav__section__title__sub-title md-reg {% if '/cookies-products/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies_products' %}'">구움과자 상품</li>
+          <li class="nav__section__title__sub-title md-reg {% if '/cookies-times/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies_times' %}'">구움과자 픽업시간</li>
         </ul>
       </div>
       <div class="nav__section">

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load customtags %}
+
+{% block main %}
+<!-- 검색 섹션 -->
+<form method="POST">
+  {% csrf_token %}
+  <section class="paper">
+    <div class="search">
+      <p class="lg-bold">검색</p>
+      <!-- 인풋 -->
+      <div class="search__mid">
+        <div class="search__mid__box">
+          <p class="md-bold">상품 유형</p>
+          <select name="product_category" id="" class="md-reg search__mid__box">
+            <option value="" class="md-reg" {% if not selected_category %}selected{% endif %}>선택해 주세요.</option>
+            <option value="0" {% if selected_category == '0' %}selected{% endif %} class="md-reg">휘낭시에</option>
+            <option value="1" {% if selected_category == '1' %}selected{% endif %} class="md-reg">조각케이크</option>
+            <option value="2" {% if selected_category == '2' %}selected{% endif %} class="md-reg">스콘</option>
+            <option value="3" {% if selected_category == '3' %}selected{% endif %} class="md-reg">오늘의 메뉴</option>
+          </select>
+        </div>
+      </div>
+      <!-- 버튼 -->
+      <div class="search__btm align right">
+        <button type="button" class="md-reg btn-normal txt-color-green" onclick="location.href='{% url 'cookies_products' %}'">초기화</button>
+        <button type="submit" class="emoji-btn green">
+          <div class="div_with_emoji">
+            <span class="md-reg emoji_mgb02">🔍</span>
+            <span class="md-reg txt-color-white">검색</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+</form>
+
+<!-- 테이블 섹션 -->
+<section class="paper">
+  <div class="table">
+    <!-- 상단 -->
+    <div class="align both table__top">
+      <span class="lg-bold">상품 목록</span>
+      <button class="emoji-btn green" onclick="location.href='{% url 'cookies_products_add' %}'">
+        <div class="div_with_emoji">
+          <span class="lg-reg emoji_mgb02">✨</span>
+          <span class="md-reg txt-color-white">상품 추가</span>
+        </div>
+      </button>
+    </div>
+    <!-- 중단 -->
+    <table class="table__table">
+      <colgroup>
+        <col style="width: 5%;">  <!-- 순서 -->
+        <col style="width: 7%;">  <!-- 이미지 -->
+        <col style="width: 10%;">  <!-- 상품유형 -->
+        <col style="width: 20%;">  <!-- 상품명 -->
+        <col style="width: 10%;">  <!-- 가격 -->
+        <col style="width: 30%;">  <!-- 상품 설명 -->
+        <col style="width: 12%;">  <!-- 기능 -->
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="md-bold">번호</th>
+          <th class="md-bold">이미지</th>
+          <th class="md-bold">상품 유형</th>
+          <th class="md-bold">상품명</th>
+          <th class="md-bold">가격</th>
+          <th class="md-bold">상품 설명</th>
+          <th class="md-bold">기능</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td class="md-reg">{{ forloop.counter }}</td>
+          <td>
+            <img src="/admin_media/{{ product.img }}" alt="" class="table__table__img">
+          </td>
+          <td class="md-reg">{{ product.get_category_display }}</td>
+          <td class="md-reg">{{ product.name }}</td>
+          <td class="md-reg">{{ product.price | intcomma }}원</td>
+          <td class="md-reg">{{ product.cmt }}</td>
+          <td class="">
+            <div class="table__table__functions">
+              <button class="lg-reg" onclick="location.href='{% url 'cookies_products_view' product.id %}'">👀</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cookies_products_edit' product.id %}'">✍🏽</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cookies_products_delete' product.id %}'">🗑️</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <!-- 하단 -->
+    <div class="align center">
+      <ul class="table__paging">
+        <li class="align center"><button class="lg-bold">👈🏽</button></li>
+
+        <li><button class="align center md-reg table__paging__btn">3</button></li>
+        <li><button class="align center md-reg table__paging__btn">4</button></li>
+        <li><button class="align center md-reg table__paging__btn">5</button></li>
+        <li><button class="align center md-reg table__paging__btn active">6</button></li>
+        <li><button class="align center md-reg table__paging__btn">7</button></li>
+        <li><button class="align center md-reg table__paging__btn">8</button></li>
+        <li><button class="align center md-reg table__paging__btn">9</button></li>
+
+        <li class="align center"><button class="lg-bold">👉🏽</button></li>
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

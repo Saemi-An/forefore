@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<section class="paper">
+  <div class="table">
+    <!-- 상단 -->
+    <div class="align both table__top">
+      <span class="lg-bold">픽업시간 목록</span>
+      <button class="emoji-btn green" onclick="location.href='{% url 'cookies_times_add' %}'">
+        <div class="div_with_emoji">
+          <span class="lg-reg emoji_mgb02">✨</span>
+          <span class="md-reg txt-color-white">픽업시간 추가</span>
+        </div>
+      </button>
+    </div>
+    <!-- 중단 -->
+    <table class="table__table">
+      <colgroup>
+        <col style="width: 5%;">  <!-- 번호 -->
+        <col style="width: 40%;">  <!-- 픽업시간 이름 -->
+        <col style="width: 10%;">  <!-- 픽업 시작 -->
+        <col style="width: 10%;">  <!-- 픽업 마감 -->
+        <col style="width: 10%;">  <!-- 시간 간격 -->
+        <col style="width: 12%;">  <!-- 기능 -->
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="md-bold">번호</th>
+          <th class="md-bold">픽업시간 이름</th>
+          <th class="md-bold">픽업 시작</th>
+          <th class="md-bold">픽업 마감</th>
+          <th class="md-bold">시간 간격</th>
+          <th class="md-bold">기능</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for time in times %}
+        <tr>
+          <td class="md-reg">{{ forloop.counter }}</td>
+          <td class="md-reg">{{ time.name }}</td>
+          <td class="md-reg">{{ time.start }}시</td>
+          <td class="md-reg">{{ time.end }}시</td>
+          <td class="md-reg">{{ time.interval }}분</td>
+          <td>
+            <div class="table__table__functions">
+              <button class="lg-reg" onclick="location.href='{% url 'cookies_times_view' time.pk %}'">👀</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cookies_times_edit' time.pk %}'">✍🏽</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cookies_times_delete' time.pk %}'">🗑️</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <!-- 하단 -->
+    <div class="align center">
+      <ul class="table__paging">
+        <li class="align center"><button class="lg-bold">👈🏽</button></li>
+
+        <li><button class="align center md-reg table__paging__btn">3</button></li>
+        <li><button class="align center md-reg table__paging__btn">4</button></li>
+        <li><button class="align center md-reg table__paging__btn">5</button></li>
+        <li><button class="align center md-reg table__paging__btn active">6</button></li>
+        <li><button class="align center md-reg table__paging__btn">7</button></li>
+        <li><button class="align center md-reg table__paging__btn">8</button></li>
+        <li><button class="align center md-reg table__paging__btn">9</button></li>
+
+        <li class="align center"><button class="lg-bold">👉🏽</button></li>
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

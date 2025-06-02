@@ -32,5 +32,5 @@ def create_pickup_instances(sender, instance, created, **kwargs):
 
                     time_str = f'{hour:02}:{minute:02}'
                     if time_str not in all_pickup_times:  # 중복 시간 없을 때에만 생성
-                        Pickups.objects.create(time=time_str, time_id=instance)
+                        Pickups.objects.create(str_time=time_str, time=instance)
                     current_time += interval

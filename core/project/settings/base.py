@@ -110,5 +110,5 @@ MEDIA_URL = '/admin_media/'  # 사용자가 브라우저에서 미디어 파일�
 
 # 관리자 로그인
 LOGIN_URL = '/manager/login'
-LOGIN_REDIRECT_URL = '/manager'
+LOGIN_REDIRECT_URL = '/manager/cookies'
 LOGOUT_REDIRECT_URL = '/manager/login'

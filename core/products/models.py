@@ -1,8 +1,6 @@
 from django.db import models
 
 # =================================== 공통 ===================================
-
-
 class Sale(models.Model):
 
     class Meta:
@@ -16,10 +14,7 @@ class Sale(models.Model):
 
 
 # =================================== 구움과자 ===================================
-
-
 class Products(models.Model):
-
     class Meta:
         verbose_name_plural = '구움과자 상품'
         db_table = 'Products'
@@ -31,9 +26,9 @@ class Products(models.Model):
         todaysmenu = 3, '오늘의 메뉴'
 
     category = models.PositiveIntegerField(choices=Cookie_Categories.choices)
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=100)   # 30
     price = models.PositiveIntegerField()
-    cmt = models.CharField(max_length=100, blank=True)
+    cmt = models.CharField(max_length=1000, blank=True)   # 100
     img = models.ImageField(upload_to='cookies')
 
     def __str__(self):
@@ -111,7 +106,6 @@ class Cookies(models.Model):
 
 
 class Times(models.Model):
-
     class Meta:
         verbose_name_plural = '구움과자 픽업시간'
         db_table = 'Times'
