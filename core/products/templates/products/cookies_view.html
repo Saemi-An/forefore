@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load customtags %}
+
+{% block main %}
+<section class="paper">
+  <div class="view">
+    <p class="lg-bold">판매 상품 열람</p>
+    <section class="view__sect">
+      <p class="lg-bold view__sect__title">상품 정보</p>
+      <div class="view__sect__newbody">
+        <div class="view__sect__newbody__left">
+          <div class="view__sect__newbody__left__row">
+            <p class="md-bold">상품 유형</p>
+            <p class="md-reg">{{ cookie.product.get_category_display }}</p>
+          </div>
+          <div class="view__sect__newbody__left__row">
+            <p class="md-bold">상품명</p>
+            <p class="md-reg">{{ cookie.product.name }}</p>
+          </div>
+          <div class="view__sect__newbody__left__row">
+            <p class="md-bold">가격</p>
+            <p class="md-reg">{{ cookie.product.price | intcomma }}원</p>
+          </div>
+          <div class="view__sect__newbody__left__row">
+            <p class="md-bold">상품 설명</p>
+            <p class="md-reg">{% if cookie.product.cmt %}{{ cookie.product.cmt }}{% else %}-{% endif %}</p>
+          </div>
+        </div>
+        <div class="view__sect__newbody__right">
+          <img src="/admin_media/{{ cookie.product.img }}" alt="" class="view__sect__newbody__right__img">
+          <p class="md-bold">상품 이미지</p>
+        </div>
+      </div>
+    </section>
+    <section class="view__sect">
+      <p class="lg-bold view__sect__title">상품 정보</p>
+      <div class="view__sect__body">
+        <div class="view__sect__body__row">
+          <p class="md-bold">노출 상태</p>
+          <p class="md-reg">
+          {% if cookie.status == 0 %}
+            ⚪️ {{ cookie.get_status_display }}   <!-- 판매 대기중 -->
+          {% elif cookies.status == 1 %}
+            🟢 {{ cookie.get_status_display }}   <!-- 판매중 -->
+          {% elif cookies.status == 2 %}
+            🟡 {{ cookie.get_status_display }}   <!-- 재고 소진 -->
+          {% elif cookies.status == 3 %}
+            ⚫️ {{ cookie.get_status_display }}   <!-- 시즌 종료 -->
+          {% endif %}
+          </p>
+        </div>
+      </div>
+    </section>
+    <section class="view__sect">
+      <p class="lg-bold view__sect__title">상품 정보</p>
+      <div class="view__sect__body">
+        <div class="view__sect__body__row">
+          <p class="md-bold">총 재고</p>
+          <p class="md-reg">{{ cookie.total }}개</p>
+        </div>
+        <div class="view__sect__body__row">
+          <p class="md-bold">안전 재고</p>
+          <p class="md-reg">{{ cookie.safe }}개</p>
+        </div>
+        <div class="view__sect__body__row">
+          <p class="md-bold">현재 재고</p>
+          <p class="md-reg">{{ cookie.current }}개</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="align both">
+  <button class="md-reg btn-normal txt-color-green" onclick="goBack()">뒤로가기</button>
+  <div class="view-btn">
+    <button class="emoji-btn green" onclick="location.href='{% url 'cookies_products_edit' cookie.pk %}'">
+      <div class="div_with_emoji">
+        <span class="md-reg emoji_mgb04">✍🏽</span>
+        <span class="md-reg txt-color-white">수정하기</span>
+      </div>
+    </button>
+    <button class="emoji-btn green" onclick="location.href='{% url 'cookies_delete' cookie.id %}'">
+      <div class="div_with_emoji">
+        <span class="md-reg emoji_mgb04">🗑️</span>
+        <span class="md-reg txt-color-white">삭제하기</span>
+      </div>
+    </button>
+  </div>
+</section>
+{% endblock %}

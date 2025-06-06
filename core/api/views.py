@@ -1,7 +1,11 @@
 from rest_framework.decorators import api_view, permission_classes  # noqa: F401
-from rest_framework.permissions import IsAdminUser, IsAuthenticated  # noqa: F401
 from rest_framework.response import Response
+# from rest_framework.permissions import IsAdminUser, IsAuthenticated  # noqa: F401
 
+from django.shortcuts import get_object_or_404
+
+from .serializers import CookiesSerializer
+from core.products.models import Cookies
 
 @api_view(['GET'])
 def get_routes(request):
@@ -10,3 +14,10 @@ def get_routes(request):
     ]
 
     return Response(routes)
+
+@api_view(['GET'])
+# @permission_classes([IsAdminUser])   // 어드민에서는 session 기반 인증을 진행하기 때문에 사용 안함
+def get_cookie(request, pk):
+    cookie = get_object_or_404(Cookies, id=pk)
+    serializer = CookiesSerializer(cookie)
+    return Response(serializer.data)

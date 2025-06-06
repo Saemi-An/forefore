@@ -1,16 +1,18 @@
 from django import forms
-from .models import Products, Times
+
+from .models import Products, Times, Cookies, Sales
+
 
 class ProductAdd(forms.ModelForm):
     class Meta:
         model = Products
         fields = '__all__'
         widgets = {
-            'category' : forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options'}),
-            'name' : forms.TextInput(attrs={'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
-            'price' : forms.NumberInput(attrs={'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
-            'cmt' : forms.Textarea(attrs={'rows': 3, 'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
-            'img' : forms.ClearableFileInput(attrs={'id': 'fileUpload', 'class': 'display-none'}),
+            'category': forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options'}),
+            'name': forms.TextInput(attrs={'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
+            'price': forms.NumberInput(attrs={'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
+            'cmt': forms.Textarea(attrs={'rows': 3,'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
+            'img': forms.ClearableFileInput(attrs={'id': 'fileUpload', 'class': 'display-none'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -34,7 +36,7 @@ class ProductAdd(forms.ModelForm):
         if category == '':
             raise forms.ValidationError('필수 입력값 입니다.')
         return category
-    
+
     def clean_name(self):
         name = self.cleaned_data.get('name')
         if name is None or name == '':
@@ -48,7 +50,7 @@ class ProductAdd(forms.ModelForm):
         if price != 0 and not price:
             raise forms.ValidationError('필수 입력값 입니다.')
         return price
-    
+
     def clean_cmt(self):
         cmt = self.cleaned_data.get('cmt')
         if len(cmt) > 100:
@@ -63,21 +65,22 @@ class ProductAdd(forms.ModelForm):
             raise forms.ValidationError('필수 입력값 입니다.')
         return img
 
+
 class TimeAdd(forms.ModelForm):
     class Meta:
         model = Times
-        exclude = ('selected', )
+        exclude = ('selected',)
         widgets = {
-            'name' : forms.TextInput(attrs={'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
-            'start' : forms.Select(
-                choices=[('', '선택')] + [(i, f'{i}시') for i in range(10, 20)],
-                attrs={'class': 'md-reg add_md-reg_class_to_options'}
+            'name': forms.TextInput(attrs={'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
+            'start': forms.Select(
+                    choices=[('', '선택')] + [(i, f'{i}시') for i in range(10, 20)],
+                    attrs={'class': 'md-reg add_md-reg_class_to_options'}
                 ),
-            'end' : forms.Select(
-                choices=[('', '선택')] + [(i, f'{i}시') for i in range(10, 20)],
-                attrs={'class': 'md-reg add_md-reg_class_to_options'}
+            'end': forms.Select(
+                    choices=[('', '선택')] + [(i, f'{i}시') for i in range(10, 20)],
+                    attrs={'class': 'md-reg add_md-reg_class_to_options'}
                 ),
-            'interval' : forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options'}),
+            'interval': forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -102,13 +105,13 @@ class TimeAdd(forms.ModelForm):
         elif len(name) > 30:
             raise forms.ValidationError('공백포함 최대 30자까지 입력이 가능합니다.')
         return name
-    
+
     def clean_interval(self):
         interval = self.cleaned_data.get('interval')
         if interval == '':
             raise forms.ValidationError('필수 입력값 입니다.')
         return interval
-    
+
     def clean(self):
         cleaned_data = super().clean()
         start = cleaned_data.get('start')
@@ -119,3 +122,57 @@ class TimeAdd(forms.ModelForm):
                 self.add_error('start', '시작 시간과 마감 시간을 확인해 주세요.')
         else:
             self.add_error('start', '필수 입력값 입니다.')
+
+
+class CookieAdd(forms.ModelForm):
+    class Meta:
+        model = Cookies
+        exclude = ('current', 'index', )
+        widgets = {
+            'product': forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options', 'id': 'selectProduct'}),
+            'status': forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options', 'id': 'selectStatus'}),
+            'total': forms.NumberInput(attrs={'class' : 'md-reg', 'placeholder' : '입력해 주세요.', 'id': 'inputTotal'}),
+            'safe': forms.NumberInput(attrs={'class' : 'md-reg', 'placeholder' : '입력해 주세요.', 'id': 'inputSafe'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # product 드롭다운 기본값 커스텀
+        # used_products = Cookies.objects.values_list('product_id', flat=True)   # <QuerySet [2, 3]>
+        # self.fields['product'].queryset = Products.objects.exclude(id__in=used_products)
+        self.fields['product'].empty_label = "선택해 주세요."
+        used_ids = set(Cookies.objects.values_list('product_id', flat=True))
+        self.registered = used_ids
+
+        # status 드롭다운 기본값 커스텀
+        status_choices = self.fields['status'].choices
+        if status_choices and status_choices[0][0] == '':
+            self.fields['status'].choices = [('', '선택해 주세요.')] + list(status_choices[1:])
+
+        # html 속성 커스텀
+        self.fields['product'].required = False
+        self.fields['status'].required = False
+        self.fields['total'].required = False
+        self.fields['safe'].required = False
+
+        # 구움과자 판매상태
+        # sales = Sales.objects.get(id=1).on_sale
+
+        # if sales:
+        #     self.fields['status'].choices = []
+        # else:
+        #     self.fields['status'].choices = []
+
+    # 페이지가 아니라 모달이기 때문에 유효성 검사 js로 하고 있음
+
+# class PickupAdd(forms.Form):
+#     pickup = forms.ModelMultipleChoiceField(
+#         queryset=Times.objects.all().order_by('name', 'start', 'end'),
+#         widget=forms.CheckboxSelectMultiple(),
+#         required = False,
+#         )
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+        
+#         self.fields["pickup"].initial = Times.objects.filter(selected=True)

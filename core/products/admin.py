@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from .models import Cookies, Pickups, Products, Sale, Times
+from .models import Cookies, Pickups, Products, Sales, Times
 
-admin.site.register(Sale)
+admin.site.register(Sales)
 admin.site.register(Products)
 admin.site.register(Cookies)
 admin.site.register(Times)

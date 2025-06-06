@@ -1,37 +1,163 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load customtags %}
+
+{% block script %}
+<script src="{% static 'js/products/cookies.js' %}" defer></script>
+{% endblock %}
+
+{% block modal %}
+<!-- 일반 모달 -->
+<div class="modal" id="normalModal">
+  <div class="modal__cnt">
+    {% if sales %}
+    <p class="lg-bold">🌙 예약 판매 마감 🌙</p>
+    <div class="modal__cnt__txt">
+      <div>
+        <p class="md-reg">관리자 페이지에서</p>
+        <p class="md-reg"><span class="md-bold txt-color-orange">선택된 픽업시간이 초기화 됩니다.</span></p>
+      </div>
+      <div>
+        <p class="md-reg">사용자 페이지에서</p>
+        <p class="md-reg"><span class="md-bold txt-color-orange">픽업 시간 선택란이 초기화 됩니다.</span></p>
+      </div>
+      <div>
+        <p class="md-reg">오늘의 구움과자 판매를</p>
+        <p class="md-reg">종료 하시겠습니까?</p>
+      </div>
+    </div>
+    {% else %}
+    <p class="lg-bold">✨ 예약 판매 시작 ✨</p>
+    <div class="modal__cnt__txt">
+      <div>
+        <p class="md-reg">판매 중에는</p>
+        <p class="md-reg"><span class="md-bold txt-color-orange">픽업시간 변경이 불가능</span> 합니다.</p>
+      </div>
+      <div>
+        <p class="md-reg">오늘의 구움과자 판매를</p>
+        <p class="md-reg">시작 하시겠습니까?</p>
+      </div>
+    </div>
+    {% endif %}
+    <div class="modal__cnt__btn">
+      <button type="button" class="md-reg btn-normal txt-color-green" onclick="closeNormalModal()">취소</button>
+      <button class="md-reg btn-green txt-color-white" onclick="location.href='{% url 'change_cookies_sale' %}'">확인</button>
+    </div>
+  </div>
+</div>
+<!-- 폼 모달 -->
+<div class="modal" id="formModal">
+  <form action="" method="POST" class="modal__form" id="addCookieForm">
+    {% csrf_token %}
+    <p class="lg-bold">⚡️ 판매 상품 추가 ⚡️</p>
+    <div class="modal__form__cnt">
+      <div class="modal__form__cnt__elem">
+        <div class="modal__form__cnt__elem__sub-title">
+          <p class="md-bold">판매 상품</p>
+          <span class="md-bold txt-color-orange">*</spans>
+        </div>
+        <select name="product" class="md-reg add_md-reg_class_to_options" id="selectProduct">
+        {% for id, name in form.fields.product.choices %}
+          <option value="{{ id }}" {% if id in form.registered %}disabled{% endif %}>{{ name }}</option>
+        {% endfor %}
+        </select>
+        {% comment %} {{ form.product }} {% endcomment %}
+        <span class="sm-reg txt-color-orange mgl4 display-none" id="selectProductMsg"></span>
+      </div>
+      <div class="modal__form__cnt__elem">
+        <div class="modal__form__cnt__elem__sub-title">
+          <p class="md-bold">노출 상태</p>
+          <span class="md-bold txt-color-orange">*</spans>
+        </div>
+        {{ form.status }}
+        <span class="sm-reg txt-color-orange mgl4 display-none" id="selectStatusMsg"></span>
+      </div>
+      <div class="modal__form__cnt__elem-double">
+        <div class="modal__form__cnt__elem">
+          <div class="modal__form__cnt__elem__sub-title">
+            <p class="md-bold">전체 재고 수량</p>
+            <span class="md-bold txt-color-orange">*</spans>
+          </div>
+          {{ form.total }}
+          <span class="sm-reg txt-color-orange mgl4 display-none" id="inputTotalMsg"></span>
+        </div>
+        <div class="modal__form__cnt__elem">
+          <div class="modal__form__cnt__elem__sub-title">
+            <p class="md-bold">안전 재고 수량</p>
+            <span class="md-bold txt-color-orange">*</spans>
+            </div>
+            {{ form.safe }}
+            <span class="sm-reg txt-color-orange mgl4 display-none" id="inputSafeMsg"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal__form__btn">
+      <button type="button" class="md-reg btn-normal txt-color-green" onclick="closeFormModal()">취소하기</button>
+      <button type="submit" class="md-reg btn-green txt-color-white" onclick="submitCookieAdd(event)">저장하기</button>
+    </div>
+  </form>
+</div>
+<!-- 픽업 폼 모달 -->
+<div class="modal" id="pickupModal">
+  <form action="{% url 'cookies_pickups_add' %}" method="POST" class="modal__pickup" id="pickupModalForm">
+    {% csrf_token %}
+    <p class="lg-bold">⚡️ 픽업 시간 추가 ⚡️</p>
+    <div class="modal__pickup__elem">
+      <div class="modal__pickup__elem__subtitle">
+        <p class="md-bold">픽업 시간</p>
+        <span class="md-bold txt-color-orange">*</spans>
+      </div>
+      {% for time in times %}
+      <button type="button" class="modal__pickup__elem__checkbox" onclick="selectPickupTimes(event, {{ time.id }})">
+        <div class="btn-check_{% if time.selected %}on{% else %}off{% endif %}" data-selected="{{ time.id }}"></div>
+        <span class="md-reg">{{ time.name }}</span>
+      </button>
+      {% endfor %}
+      <span class="sm-reg txt-color-orange mgl4 display-none" id="checkSelectedMsg">필수 입력값 입니다.</span>
+    </div>
+    <div class="modal__cnt__btn">
+      <button type="button" class="md-reg btn-normal txt-color-green" onclick="closePickupModal()">취소하기</button>
+      <button type="submit" class="md-reg btn-green txt-color-white" onclick="submitPickupModal(event)">저장하기</button>
+      <input type="hidden" name="selected_times" id="" value="">
+    </div>
+  </form>
+</div>
+{% endblock %}
 
 {% block main %}
 <!-- 검색 섹션 -->
-<section class="paper">
+<section class="paper {% if sales %}on-sale{% endif %}">
   <div class="search">
     <p class="lg-bold">판매 설정</p>
     <!-- 인풋 -->
     <div class="search__mid">
       <div class="search__mid__box">
         <p class="md-bold">판매 상태</p>
-        <input type="text" class="md-reg search__mid__box no-input" value="{% if sale %}예약 가능{% else %}예약 종료{% endif %}">
+        <input type="text" class="md-bold search__mid__box no-input txt-color-{% if sales %}orange{% else %}navy{% endif %}" value="{% if sales %}예약 가능{% else %}예약 종료{% endif %}">
       </div>
       <div class="search__mid__box">
-        <p class="md-bold">필드 타이틀</p>
-        <input type="text" class="md-reg search__mid__box" value="미리 넣어둔 값">
-        <input type="text" class="md-reg search__mid__box" value="미리 넣어둔 값">
-        <input type="text" class="md-reg search__mid__box" value="미리 넣어둔 값">
-        <input type="text" class="md-reg search__mid__box" value="미리 넣어둔 값">
+        <p class="md-bold">픽업 시간</p>
+      {% if selected_times %}
+      {% for selected_time in selected_times %}
+        <input type="text" class="md-reg search__mid__box no-input" value="{{ selected_time.name }}">
+      {% endfor %}
+      {% else %}
+        <input type="text" class="md-reg search__mid__box no-input" value="픽업 시간을 선택해 주세요.">
+      {% endif %}
       </div>
     </div>
     <!-- 버튼 -->
-    <div class="search__btm align right">
-      <button class="emoji-btn green">
-        <div class="div_with_emoji">
-          <span class="md-reg emoji_mgb02">🛍️</span>
-          <span class="md-reg txt-color-white">예약 상태 변경</span>
-        </div>
-      </button>
-      <button class="emoji-btn green">
+    <div class="search__btn align right">
+      <button class="emoji-btn {% if sales %}on-sale{% endif %}" onclick="showPickupModal()">
         <div class="div_with_emoji">
           <span class="md-reg emoji_mgb02">⏱️</span>
-          <span class="md-reg txt-color-white">버튼명</span>
+          <span class="md-reg">픽업 시간 추가</span>
+        </div>
+      </button>
+      <button class="emoji-btn green" onclick="showNormalModal()">
+        <div class="div_with_emoji">
+          <span class="md-reg emoji_mgb02">🛍️</span>
+          <span class="md-reg txt-color-white">판매 상태 변경</span>
         </div>
       </button>
     </div>
@@ -39,30 +165,33 @@
 </section>
 
 <!-- 테이블 섹션 -->
-<section class="paper">
+<section class="paper {% if sales %}on-sale{% endif %}">
   <div class="table">
     <!-- 상단 -->
     <div class="align both table__top">
       <span class="lg-bold">판매 상품 목록</span>
-      <button class="emoji-btn green">
+      <button class="emoji-btn green" onclick="showFormModal()">
         <div class="div_with_emoji">
           <span class="lg-reg emoji_mgb02">✨</span>
-          <span class="md-reg txt-color-white">버튼명</span>
+          <span class="md-reg txt-color-white">판매 상품 추가</span>
         </div>
       </button>
     </div>
     <!-- 구움과자 필터 -->
     <ul class="table__tab">
-      <li><button class="md-reg table__tab__filter active">🍀 전체</button></li>
-      <li><button class="md-reg table__tab__filter">🧈 휘낭시에</button></li>
-      <li><button class="md-reg table__tab__filter">🍰 조각케이크</button></li>
-      <li><button class="md-reg table__tab__filter">🥮 스콘</button></li>
-      <li><button class="md-reg table__tab__filter">🥨 오늘의 메뉴</button></li>
+      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 100 %}active{% endif %}" onclick="location.href='{% url 'cookies' 'all' %}'">🍀 전체</button></li>
+      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 0%}active{% endif %}" onclick="location.href='{% url 'cookies' 'financier' %}'">🧈 휘낭시에</button></li>
+      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 1%}active{% endif %}" onclick="location.href='{% url 'cookies' 'cakepiece' %}'">🍰 조각케이크</button></li>
+      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 2%}active{% endif %}" onclick="location.href='{% url 'cookies' 'scone' %}'">🥮 스콘</button></li>
+      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 3%}active{% endif %}" onclick="location.href='{% url 'cookies' 'todays-menu' %}'">🥨 오늘의 메뉴</button></li>
     </ul>
     <!-- 중단 -->
     <table class="table__table">
       <colgroup>
         <col style="width: 5%;">  <!-- 순서 -->
+        {% if filter != 100 %}
+        <col style="width: 10%;">  <!-- 인덱스 -->
+        {% endif %}
         <col style="width: 7%;">  <!-- 이미지 -->
         <col style="width: 10%;">  <!-- 상품유형 -->
         <col style="width: 20%;">  <!-- 상품명 -->
@@ -74,9 +203,12 @@
 
         <col style="width: 12%;">  <!-- 기능 -->
       </colgroup>
-      <thead>
+      <thead {% if sales %}class="on-sale"{% endif %}>
         <tr>
           <th class="md-bold">순서</th>
+          {% if filter != 100 %}
+          <th class="md-bold">순서 변경</th>
+          {% endif %}
           <th class="md-bold">이미지</th>
           <th class="md-bold">상품유형</th>
           <th class="md-bold">상품명</th>
@@ -87,10 +219,20 @@
           <th class="md-bold">기능</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody {% if sales %}class="on-sale"{% endif %}>
         {% for cookie in cookies %}
         <tr>
+          {% if filter == 100 %}
+          <td class="md-reg">{{ forloop.counter }}</td>
+          {% else %}
           <td class="md-reg">{{ cookie.index }}</td>
+          <td class="md-reg">
+            <div class="table__table__index">
+              <button class="table__table__index__thumb" onclick="location.href='{% url 'change_cookies_index' cookie.product.category 'up' cookie.index %}'">👍🏽</button>
+              <button class="table__table__index__thumb" onclick="location.href='{% url 'change_cookies_index' cookie.product.category 'down' cookie.index %}'">👎🏼</button>
+            </div>
+          </td>
+          {% endif %}
           <td>
             <img src="/admin_media/{{ cookie.product.img }}" alt="" class="table__table__img">
           </td>
@@ -100,11 +242,11 @@
           <td class="md-reg">
             {% if cookie.status == 0 %}
               ⚪️ {{ cookie.get_status_display }}   <!-- 판매 대기중 -->
-              {% elif cookie.status == 1 %}
+            {% elif cookie.status == 1 %}
               🟢 {{ cookie.get_status_display }}   <!-- 판매중 -->
-              {% elif cookie.status == 2 %}
+            {% elif cookie.status == 2 %}
               🟡 {{ cookie.get_status_display }}   <!-- 재고 소진 -->
-              {% elif cookie.status == 3 %}
+            {% elif cookie.status == 3 %}
               ⚫️ {{ cookie.get_status_display }}   <!-- 시즌 종료 -->
             {% endif %}
           </td>
@@ -112,9 +254,9 @@
           <td class="md-reg">{{ cookie.safe }} / {{ cookie.total }}</td>
           <td class="">
             <div class="table__table__functions">
-              <button class="lg-reg">👀</button>
-              <button class="lg-reg">✍🏽</button>
-              <button class="lg-reg">🗑️</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cookies_view' cookie.id %}'">👀</button>
+              <button class="lg-reg" onclick="getEditCookieModal({{cookie.id}})">✍🏽</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cookies_delete' cookie.id %}'">🗑️</button>
             </div>
           </td>
         </tr>

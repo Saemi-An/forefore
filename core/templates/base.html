@@ -11,6 +11,26 @@
   {% block script %}{% endblock %}
 </head>
 <body>
+  <!-- 모달 -->
+  {% block modal %}{% endblock %}
+  <!-- 토스트 메세지 -->
+  {% if messages %}
+  <ul class="toast" id="toastUl">
+    {% for msg in messages %}
+    <li class="toast__li {% if msg.tags %}{{ msg.tags }}{% endif %}">
+      {% if msg.tags == 'success' %}
+      <span class="lg-bold">✅</span>
+      <span class="md-bold txt-color-gray09">{{ msg }}</span>
+      {% elif msg.tags == 'error' %}
+      <span class="lg-bold">☹️</span>
+      <span class="md-bold txt-color-gray09">{{ msg }}</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <!-- 헤더 -->
   <header class="header align both">
     <div class="header__left align both">
       <button class="btn-logo"></button>
@@ -32,24 +52,9 @@
       </form>
     </div>
   </header>
-    <!-- 토스트 메세지 -->
-    {% if messages %}
-    <ul class="toast" id="toastUl">
-      {% for msg in messages %}
-      <li class="toast__li {% if msg.tags %}{{ msg.tags }}{% endif %}">
-        {% if msg.tags == 'success' %}
-        <span class="lg-bold">✅</span>
-        <span class="md-bold txt-color-gray09">{{ msg }}</span>
-        {% elif msg.tags == 'error' %}
-        <span class="lg-bold">☹️</span>
-        <span class="md-bold txt-color-gray09">{{ msg }}</span>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-
+  <!-- 헤더 하단 -->
   <div class="main-container">
+    <!-- 햄버거 메뉴 -->
     <nav class="nav" id="navPanel">
       <div class="nav__section">
         <div class="nav__section__title align both">
@@ -87,7 +92,7 @@
           <span class="lg-bold">📖</span>
         </div>
         <ul class="nav__section__title__sub">
-          <li class="nav__section__title__sub-title md-reg {% if '/cookies/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies' %}'">구움과자 판매</li>
+          <li class="nav__section__title__sub-title md-reg {% if '/cookies/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies' 'all' %}'">구움과자 판매</li>
           <li class="nav__section__title__sub-title md-reg {% if '/cookies-products/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies_products' %}'">구움과자 상품</li>
           <li class="nav__section__title__sub-title md-reg {% if '/cookies-times/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies_times' %}'">구움과자 픽업시간</li>
         </ul>
@@ -116,6 +121,7 @@
         </div>
       </div>
     </nav>
+    <!-- 실제 내부 컨텐츠 -->
     <main class="main column_24">
       {% block main %}{% endblock %}
     </main>

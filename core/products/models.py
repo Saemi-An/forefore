@@ -1,20 +1,22 @@
 from django.db import models
 
+
 # =================================== 공통 ===================================
-class Sale(models.Model):
+class Sales(models.Model):
 
     class Meta:
         verbose_name_plural = '판매 상태'
-        db_table = 'Sale'
+        db_table = 'Sales'
 
     on_sale = models.BooleanField(default=False)
 
-    def __str__(self):
-        return '판매중' if self.on_sale else '판매 종료'
+    # def __str__(self):
+    #     return '판매중' if self.on_sale else '판매 종료'
 
 
 # =================================== 구움과자 ===================================
 class Products(models.Model):
+
     class Meta:
         verbose_name_plural = '구움과자 상품'
         db_table = 'Products'
@@ -26,9 +28,9 @@ class Products(models.Model):
         todaysmenu = 3, '오늘의 메뉴'
 
     category = models.PositiveIntegerField(choices=Cookie_Categories.choices)
-    name = models.CharField(max_length=100)   # 30
+    name = models.CharField(max_length=100)  # 30
     price = models.PositiveIntegerField()
-    cmt = models.CharField(max_length=1000, blank=True)   # 100
+    cmt = models.CharField(max_length=1000, blank=True)  # 100
     img = models.ImageField(upload_to='cookies')
 
     def __str__(self):
@@ -59,35 +61,34 @@ class Cookies(models.Model):
 
         # 새상품 등록시에만 index 자동 부여 ------------------------------------------------
         if self._state.adding:
-            self.index = Cookies.objects.exclude(status=3).count() + 1
 
-            # if self.product.category == Products.Cookie_Categories.financier:
-            #     total = Cookies.objects.filter(product__category=Products.Cookie_Categories.financier).count()
-            #     if total == 0:
-            #         self.index = 101
-            #     else:
-            #         self.index = 101 + total
+            if self.product.category == 0:
+                total = Cookies.objects.filter(product__category=0).count()
+                if total == 0:
+                    self.index = 101
+                else:
+                    self.index = 101 + total
 
-            # elif self.product.category == Products.Cookie_Categories.cakepiece:
-            #     total = Cookies.objects.filter(product__category=Products.Cookie_Categories.cakepiece).count()
-            #     if total == 0:
-            #         self.index = 201
-            #     else:
-            #         self.index = 201 + total
+            elif self.product.category == 1:
+                total = Cookies.objects.filter(product__category=1).count()
+                if total == 0:
+                    self.index = 201
+                else:
+                    self.index = 201 + total
 
-            # elif self.product.category == Products.Cookie_Categories.scone:
-            #     total = Cookies.objects.filter(product__category=Products.Cookie_Categories.scone).count()
-            #     if total == 0:
-            #         self.index = 301
-            #     else:
-            #         self.index = 301 + total
+            elif self.product.category == 2:
+                total = Cookies.objects.filter(product__category=2).count()
+                if total == 0:
+                    self.index = 301
+                else:
+                    self.index = 301 + total
 
-            # else:
-            #     total = Cookies.objects.filter(product__category=Products.Cookie_Categories.todaysmenu).count()
-            #     if total == 0:
-            #         self.index = 401
-            #     else:
-            #         self.index = 401 + total
+            else:
+                total = Cookies.objects.filter(product__category=3).count()
+                if total == 0:
+                    self.index = 401
+                else:
+                    self.index = 401 + total
 
         # [시즌 종료] 상태라면, current_stock은 null ------------------------------------------------
         # if self.status == 3:
@@ -102,10 +103,11 @@ class Cookies(models.Model):
         super().save(*args, **kwargs)  # 상태 변경 후 다시 저장
 
     def __str__(self):
-        return f'{self.index} | {self.product.name}'
+        return f'{self.pk} | {self.product.name}'
 
 
 class Times(models.Model):
+
     class Meta:
         verbose_name_plural = '구움과자 픽업시간'
         db_table = 'Times'
