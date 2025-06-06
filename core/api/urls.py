@@ -7,6 +7,5 @@ urlpatterns = [
     path('', views.get_routes),
     path('get-token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('get-refresh-token', TokenRefreshView.as_view(), name='token_refresh'),
-    
     path('cookie/<int:pk>/', views.get_cookie),
 ]

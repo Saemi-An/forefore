@@ -3,18 +3,18 @@ from django.db.models.deletion import ProtectedError
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import Cookies, Products, Times, Sales
-from .forms import ProductAdd, TimeAdd, CookieAdd
-from .modules import get_cookie_sales, match_category_from_int_to_str, change_cookie_index
+from .forms import CookieAdd, ProductAdd, TimeAdd
+from .models import Cookies, Products, Sales, Times
+from .modules import change_cookie_index, get_cookie_sales, match_category_from_int_to_str
 
 
-    # 판매중 --> 판매 종료
-        # exclude(status=3) current = 0
-        # Times selected = False
-    # 판매 종료 --> 판매 시작
-        # 조건1: Times selected 최소 1개
-        # 조건2: 안전재고 = 현재 재고로 시작함 고지
-        # 조건3: 판매중에는 픽업시간 변경 불가
+# 판매중 --> 판매 종료
+# exclude(status=3) current = 0
+# Times selected = False
+# 판매 종료 --> 판매 시작
+# 조건1: Times selected 최소 1개
+# 조건2: 안전재고 = 현재 재고로 시작함 고지
+# 조건3: 판매중에는 픽업시간 변경 불가
 def change_cookies_sale(request):
     print('여기 찍히긴 함?')
     status = get_object_or_404(Sales, id=1)
@@ -22,25 +22,26 @@ def change_cookies_sale(request):
     filter = 'all'
     print(f'변경 전 판매 상태: {status.on_sale}')
 
-    if status.on_sale:   # 판매중 --> 판매 종료
+    if status.on_sale:  # 판매중 --> 판매 종료
         Cookies.objects.exclude(status=3).update(current=0)
         Times.objects.filter(selected=True).update(selected=False)
     else:
         if not Times.objects.filter(selected=True):
             messages.error(request, '최소 1개의 픽업시간을 설정해 주세요.')
-            return redirect('cookies', filter) 
+            return redirect('cookies', filter)
 
     status.on_sale = not status.on_sale
     status.save()
     print(f'변경 후 판매 상태: {status.on_sale}')
     toast_msg = '시작' if status.on_sale else '종료'
     messages.success(request, f'구움과자 예약 판매가 {toast_msg} 되었습니다.')
-        
+
     return redirect('cookies', filter)
+
 
 def change_cookies_index(request, category, action, idx):
     filter = match_category_from_int_to_str(category)
-    
+
     if action == 'up':
         target_idx = idx - 1
         if change_cookie_index(idx, target_idx):
@@ -58,6 +59,7 @@ def change_cookies_index(request, category, action, idx):
             messages.error(request, '더 이상 이동할 수 없습니다.')
             return redirect('cookies', filter)
 
+
 def cookies(request, category='all'):
     if category == 'financier':
         cookies = Cookies.objects.filter(product__category=0).order_by('index')
@@ -74,7 +76,6 @@ def cookies(request, category='all'):
     else:
         cookies = Cookies.objects.all().order_by('index')
         filter = 100
-        
 
     sales = get_cookie_sales()
     times = Times.objects.all().order_by('name', 'start', 'end')
@@ -94,11 +95,13 @@ def cookies(request, category='all'):
 
     return render(request, 'products/cookies.html', context)
 
+
 def cookies_view(request, pk):
     cookie = get_object_or_404(Cookies, id=pk)
     context = {'cookie': cookie}
 
     return render(request, 'products/cookies_view.html', context)
+
 
 def cookies_add(request, pk=None):
     if request.method == 'POST':
@@ -118,7 +121,7 @@ def cookies_add(request, pk=None):
             valid_form.save()
             messages.success(request, '성공적으로 저장 되었습니다.')
             return redirect('cookies')
-    
+
         # 테스트용 -- 추후 삭제 or 예외처리 필요
         else:
             print('cookies_add로 POST 요청 + 유효하지 않음 요청임')
@@ -127,19 +130,24 @@ def cookies_add(request, pk=None):
             messages.error(request, '예외처리 필요 - POST 요청 실패')
             return redirect('cookies')
 
+
 def cookies_pickups_add(request):
     if request.method == 'POST':
         val = request.POST['selected_times']
         if val:
-            id_list = list(map(lambda str_id: int(str_id), request.POST['selected_times'].strip().split(' ')))   # ['1', '2', '5']
-            Times.objects.filter(id__in=id_list).update(selected=True)   # 시그널 발생 안됨
+            id_list = list(
+                map(lambda str_id: int(str_id), request.POST['selected_times'].strip().split(' '))
+            )  # ['1', '2', '5']
+            Times.objects.filter(id__in=id_list).update(selected=True)  # 시그널 발생 안됨
         return redirect('cookies', 'all')
+
 
 def cookies_delete(request, pk):
     cookie = get_object_or_404(Cookies, id=pk)
     cookie.delete()
     messages.success(request, '성공적으로 삭제 되었습니다.')
     return redirect('cookies')
+
 
 def cookies_products(request):
     products = Products.objects.all().order_by('id')

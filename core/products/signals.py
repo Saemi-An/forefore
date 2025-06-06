@@ -4,7 +4,6 @@ from django.dispatch import receiver
 
 from .models import Pickups, Times
 
-
 # @receiver(post_save, sender=Times)
 # def create_pickup_instances(sender, instance, created, **kwargs):
 

@@ -1,10 +1,13 @@
 from django.shortcuts import get_object_or_404
-from .models import Sales, Cookies
+
+from .models import Cookies, Sales
+
 
 def get_cookie_sales():
     # sale, created = Sales.objects.get_or_create(id=1)  # 테스트 필요
     cookie_salse = get_object_or_404(Sales, pk=1).on_sale
     return cookie_salse
+
 
 def match_category_from_int_to_str(int_type):
     if int_type == 0:
@@ -15,6 +18,7 @@ def match_category_from_int_to_str(int_type):
         return 'scone'
     elif int_type == 3:
         return 'todays-menu'
+
 
 def change_cookie_index(idx, target_idx):
     if Cookies.objects.filter(index=target_idx):

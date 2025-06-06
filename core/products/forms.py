@@ -1,18 +1,32 @@
 from django import forms
 
-from .models import Products, Times, Cookies, Sales
+from .models import Cookies, Products, Sales, Times
 
 
 class ProductAdd(forms.ModelForm):
+
     class Meta:
         model = Products
         fields = '__all__'
         widgets = {
             'category': forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options'}),
-            'name': forms.TextInput(attrs={'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
-            'price': forms.NumberInput(attrs={'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
-            'cmt': forms.Textarea(attrs={'rows': 3,'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
-            'img': forms.ClearableFileInput(attrs={'id': 'fileUpload', 'class': 'display-none'}),
+            'name': forms.TextInput(attrs={
+                'class': 'md-reg',
+                'placeholder': '입력해 주세요.'
+            }),
+            'price': forms.NumberInput(attrs={
+                'class': 'md-reg',
+                'placeholder': '입력해 주세요.'
+            }),
+            'cmt': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'md-reg',
+                'placeholder': '입력해 주세요.'
+            }),
+            'img': forms.ClearableFileInput(attrs={
+                'id': 'fileUpload',
+                'class': 'display-none'
+            }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -67,20 +81,28 @@ class ProductAdd(forms.ModelForm):
 
 
 class TimeAdd(forms.ModelForm):
+
     class Meta:
         model = Times
         exclude = ('selected',)
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'md-reg', 'placeholder': '입력해 주세요.'}),
-            'start': forms.Select(
+            'name':
+                forms.TextInput(attrs={
+                    'class': 'md-reg',
+                    'placeholder': '입력해 주세요.'
+                }),
+            'start':
+                forms.Select(
                     choices=[('', '선택')] + [(i, f'{i}시') for i in range(10, 20)],
                     attrs={'class': 'md-reg add_md-reg_class_to_options'}
                 ),
-            'end': forms.Select(
+            'end':
+                forms.Select(
                     choices=[('', '선택')] + [(i, f'{i}시') for i in range(10, 20)],
                     attrs={'class': 'md-reg add_md-reg_class_to_options'}
                 ),
-            'interval': forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options'}),
+            'interval':
+                forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -125,14 +147,32 @@ class TimeAdd(forms.ModelForm):
 
 
 class CookieAdd(forms.ModelForm):
+
     class Meta:
         model = Cookies
-        exclude = ('current', 'index', )
+        exclude = (
+            'current',
+            'index',
+        )
         widgets = {
-            'product': forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options', 'id': 'selectProduct'}),
-            'status': forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options', 'id': 'selectStatus'}),
-            'total': forms.NumberInput(attrs={'class' : 'md-reg', 'placeholder' : '입력해 주세요.', 'id': 'inputTotal'}),
-            'safe': forms.NumberInput(attrs={'class' : 'md-reg', 'placeholder' : '입력해 주세요.', 'id': 'inputSafe'})
+            'product': forms.Select(attrs={
+                'class': 'md-reg add_md-reg_class_to_options',
+                'id': 'selectProduct'
+            }),
+            'status': forms.Select(attrs={
+                'class': 'md-reg add_md-reg_class_to_options',
+                'id': 'selectStatus'
+            }),
+            'total': forms.NumberInput(attrs={
+                'class': 'md-reg',
+                'placeholder': '입력해 주세요.',
+                'id': 'inputTotal'
+            }),
+            'safe': forms.NumberInput(attrs={
+                'class': 'md-reg',
+                'placeholder': '입력해 주세요.',
+                'id': 'inputSafe'
+            })
         }
 
     def __init__(self, *args, **kwargs):
@@ -166,6 +206,7 @@ class CookieAdd(forms.ModelForm):
 
     # 페이지가 아니라 모달이기 때문에 유효성 검사 js로 하고 있음
 
+
 # class PickupAdd(forms.Form):
 #     pickup = forms.ModelMultipleChoiceField(
 #         queryset=Times.objects.all().order_by('name', 'start', 'end'),
@@ -174,5 +215,5 @@ class CookieAdd(forms.ModelForm):
 #         )
 #     def __init__(self, *args, **kwargs):
 #         super().__init__(*args, **kwargs)
-        
+
 #         self.fields["pickup"].initial = Times.objects.filter(selected=True)
