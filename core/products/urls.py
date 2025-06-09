@@ -16,11 +16,11 @@ urlpatterns = [
     path('cookies/<str:category>/', login_required(views.cookies), name='cookies'),
     path('cookies/<int:idx>/<str:action>/', login_required(views.change_cookies_index), name='change_cookies_index'),
     
-    path('cookies-products/', login_required(views.cookies_products), name='cookies_products'),
     path('cookies-products/add/', login_required(views.cookies_products_add), name='cookies_products_add'),
     path('cookies-products/view/<int:pk>/', login_required(views.cookies_products_view), name='cookies_products_view'),
     path('cookies-products/edit/<int:pk>/', login_required(views.cookies_products_edit), name='cookies_products_edit'),
     path('cookies-products/delete/<int:pk>/', login_required(views.cookies_products_delete), name='cookies_products_delete'),
+    path('cookies-products/<str:category>/', login_required(views.cookies_products), name='cookies_products'),
     
     path('cookies-times/', login_required(views.cookies_times), name='cookies_times'),
     path('cookies-times/view/<int:pk>/', login_required(views.cookies_times_view), name='cookies_times_view'),

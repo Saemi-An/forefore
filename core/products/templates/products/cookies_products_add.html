@@ -76,7 +76,7 @@
         <div class="div_with_emoji">
           <span class="md-reg emoji_mgb04">👍🏽</span>
           <span type="submit" class="md-reg txt-color-white">저장하기</span>
-          <input type="hidden" name="" value={% request.path %}>
+          <input type="hidden" name="redirect_url" value="{{ referer }}">
         </div>
       </button>
     </div>

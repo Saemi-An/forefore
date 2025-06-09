@@ -9,7 +9,6 @@ def get_cookie_sales():
     cookie_salse = get_object_or_404(Sales, pk=1).on_sale
     return cookie_salse
 
-# 현재 사용 안함
 def match_category_from_int_to_str(int_type):
     if int_type == 0:
         return 'financier'
@@ -19,6 +18,8 @@ def match_category_from_int_to_str(int_type):
         return 'scone'
     elif int_type == 3:
         return 'todays-menu'
+    else:
+        return 'all'
     
 def match_category_from_str_to_int(str_type):
     if str_type == 'financier':

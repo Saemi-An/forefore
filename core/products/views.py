@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CookieAdd, ProductAdd, TimeAdd
 from .models import Cookies, Products, Sales, Times
-from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer
+from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer, match_category_from_int_to_str
 
 
 def cookies(request, category='all'):
@@ -119,7 +119,6 @@ def cookies_add(request, pk=None):
     referer = get_referer(request, 'cookies')
 
     if request.method == 'POST':
-        print('POST 요청은 옴?')
         if pk:
             cookie = get_object_or_404(Cookies, id=pk)
             form = CookieAdd(request.POST, instance=cookie)
@@ -146,18 +145,22 @@ def cookies_delete(request, pk):
     return redirect(referer)
 
 
-def cookies_products(request):
-    products = Products.objects.all().order_by('id')
-    selected_category = None
+def cookies_products(request, category='all'):
+    int_category = match_category_from_str_to_int(category)
+    if int_category == 100:
+        products = Products.objects.all().order_by('id')
+    else:
+        products = Products.objects.filter(category=int_category).order_by('id')
 
     if request.method == 'POST':
-        selected_category = request.POST['product_category']
-        if selected_category:
-            products = Products.objects.filter(category=int(selected_category)).order_by('id')
+        int_category = int(request.POST['product_category'])
+        products = Products.objects.filter(category=int_category).order_by('id')
+        str_category = match_category_from_int_to_str(int_category)
+        return redirect('cookies_products', str_category)
 
     context = {
         'products': products,
-        'selected_category': selected_category,
+        'selected_category': int_category,
     }
 
     return render(request, 'products/cookies_products.html', context)
@@ -172,14 +175,17 @@ def cookies_products_view(request, pk):
 
 def cookies_products_add(request):
     form = ProductAdd()
+    referer = get_referer(request, 'cookies-products')
 
     if request.method == 'POST':
+        redirect_url = request.POST['redirect_url']
+        
         form = ProductAdd(request.POST, request.FILES)
         if form.is_valid():
-            instance = form.save()
+            form.save()
             messages.success(request, '성공적으로 저장 되었습니다.')
-            return redirect('cookies_products_view', pk=instance.id)
-    context = {'form': form}
+            return redirect(redirect_url)
+    context = {'form': form, 'referer': referer}
 
     return render(request, 'products/cookies_products_add.html', context)
 
@@ -187,20 +193,24 @@ def cookies_products_add(request):
 def cookies_products_edit(request, pk):
     product = get_object_or_404(Products, id=pk)
     form = ProductAdd(instance=product)
+    referer = get_referer(request, 'cookies-products')
 
     if request.method == 'POST':
+        redirect_url = request.POST['redirect_url']
+        
         form = ProductAdd(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
             messages.success(request, '성공적으로 저장 되었습니다.')
-            return redirect('cookies_products_view', pk=product.id)
+            return redirect(redirect_url)
 
-    context = {'form': form, 'product': product}
+    context = {'form': form, 'product': product, 'referer': referer}
 
     return render(request, 'products/cookies_products_add.html', context)
 
 
 def cookies_products_delete(request, pk):
+    referer = get_referer(request, 'cookies-products')
     product = get_object_or_404(Products, id=pk)
     try:
         product.delete()
@@ -210,7 +220,7 @@ def cookies_products_delete(request, pk):
         # 유저가 주문서 작성 도중에 삭제하는 경우 - 예외처리 필요
         # get()으로 인스턴스 조회한 다음 분기처리 필요(4번)
 
-    return redirect('cookies_products')
+    return redirect(referer)
 
 
 def cookies_times(request):

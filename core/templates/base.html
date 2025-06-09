@@ -93,7 +93,7 @@
         </div>
         <ul class="nav__section__title__sub">
           <li class="nav__section__title__sub-title md-reg {% if '/cookies/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies' 'all' %}'">구움과자 판매</li>
-          <li class="nav__section__title__sub-title md-reg {% if '/cookies-products/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies_products' %}'">구움과자 상품</li>
+          <li class="nav__section__title__sub-title md-reg {% if '/cookies-products/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies_products' 'all' %}'">구움과자 상품</li>
           <li class="nav__section__title__sub-title md-reg {% if '/cookies-times/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies_times' %}'">구움과자 픽업시간</li>
         </ul>
       </div>

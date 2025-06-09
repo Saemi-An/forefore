@@ -13,17 +13,17 @@
         <div class="search__mid__box">
           <p class="md-bold">상품 유형</p>
           <select name="product_category" id="" class="md-reg search__mid__box">
-            <option value="" class="md-reg" {% if not selected_category %}selected{% endif %}>선택해 주세요.</option>
-            <option value="0" {% if selected_category == '0' %}selected{% endif %} class="md-reg">휘낭시에</option>
-            <option value="1" {% if selected_category == '1' %}selected{% endif %} class="md-reg">조각케이크</option>
-            <option value="2" {% if selected_category == '2' %}selected{% endif %} class="md-reg">스콘</option>
-            <option value="3" {% if selected_category == '3' %}selected{% endif %} class="md-reg">오늘의 메뉴</option>
+            <option value="100" class="md-reg" {% if not selected_category %}selected{% endif %}>선택해 주세요.</option>
+            <option value="0" {% if selected_category == 0 %}selected{% endif %} class="md-reg">휘낭시에</option>
+            <option value="1" {% if selected_category == 1 %}selected{% endif %} class="md-reg">조각케이크</option>
+            <option value="2" {% if selected_category == 2 %}selected{% endif %} class="md-reg">스콘</option>
+            <option value="3" {% if selected_category == 3 %}selected{% endif %} class="md-reg">오늘의 메뉴</option>
           </select>
         </div>
       </div>
       <!-- 버튼 -->
       <div class="search__btn align right">
-        <button type="button" class="md-reg btn-normal txt-color-green" onclick="location.href='{% url 'cookies_products' %}'">초기화</button>
+        <button type="button" class="md-reg btn-normal txt-color-green" onclick="location.href='{% url 'cookies_products' 'all' %}'">초기화</button>
         <button type="submit" class="emoji-btn green">
           <div class="div_with_emoji">
             <span class="md-reg emoji_mgb02">🔍</span>
