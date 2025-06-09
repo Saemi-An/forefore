@@ -97,8 +97,8 @@ class Cookies(models.Model):
         #     self.current = None
 
         # 판매중(status=1)에 현재재고가 0이 되면, 예약 마감(status=2)로 변경 ------------------------------------------------
-        # if self.status == 1 and self.current == 0:
-        #     self.status = 2
+        if self.status == 1 and self.current == 0:
+            self.status = 2
 
         super().save(*args, **kwargs)  # 상태 변경 후 다시 저장
 
@@ -126,7 +126,7 @@ class Times(models.Model):
     # end는 start보다 작을 수 없음
     # 픽업시간 템플릿이 <구움과자 판매> 페이지에서 픽업시간으로 사용중인 경우, 삭제 불가
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.id} | {self.name[:7]} | {self.selected}'
 
 
 class Pickups(models.Model):

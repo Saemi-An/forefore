@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.products.models import Cookies, Products
+from core.products.models import Cookies, Products, Sales
 
 
 class ProductsSerializer(serializers.ModelSerializer):
@@ -15,4 +15,10 @@ class CookiesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cookies
+        fields = '__all__'
+
+class SalesCookieSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Sales
         fields = '__all__'

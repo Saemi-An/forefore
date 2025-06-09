@@ -175,18 +175,20 @@ class CookieAdd(forms.ModelForm):
             })
         }
 
+    # 모달이라 유효성 검사는 JS로
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # product 드롭다운 기본값 커스텀
-        # used_products = Cookies.objects.values_list('product_id', flat=True)   # <QuerySet [2, 3]>
-        # self.fields['product'].queryset = Products.objects.exclude(id__in=used_products)
-        self.fields['product'].empty_label = "선택해 주세요."
+            # form에 registered 값 함께 넘김 --> html에서 option 값만 수동 렌더링
+        self.fields['product'].empty_label = '선택해 주세요.'
         used_ids = set(Cookies.objects.values_list('product_id', flat=True))
         self.registered = used_ids
 
         # status 드롭다운 기본값 커스텀
         status_choices = self.fields['status'].choices
+        # self.fields['status'].empty_label = '선택해 주세요.'
         if status_choices and status_choices[0][0] == '':
             self.fields['status'].choices = [('', '선택해 주세요.')] + list(status_choices[1:])
 
@@ -197,23 +199,16 @@ class CookieAdd(forms.ModelForm):
         self.fields['safe'].required = False
 
         # 구움과자 판매상태
-        # sales = Sales.objects.get(id=1).on_sale
+        sales = Sales.objects.get(id=1).on_sale
 
-        # if sales:
-        #     self.fields['status'].choices = []
-        # else:
-        #     self.fields['status'].choices = []
+        if sales:
+            self.fields['status'].choices = [('', '선택해 주세요.'), (Cookies.Cookie_Status.on_sale, '판매중'), (Cookies.Cookie_Status.out, '시즌 종료')]
 
-    # 페이지가 아니라 모달이기 때문에 유효성 검사 js로 하고 있음
+            # existing_classes_from_total = self.fields['total'].widget.attrs.get('class', '')
+            # self.fields['total'].widget.attrs['class'] = f'{existing_classes_from_total} no-input'
+            
+            # existing_classes_from_safe = self.fields['safe'].widget.attrs.get('class', '')
+            # self.fields['safe'].widget.attrs['class'] = f'{existing_classes_from_safe} no-input'
 
-
-# class PickupAdd(forms.Form):
-#     pickup = forms.ModelMultipleChoiceField(
-#         queryset=Times.objects.all().order_by('name', 'start', 'end'),
-#         widget=forms.CheckboxSelectMultiple(),
-#         required = False,
-#         )
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-
-#         self.fields["pickup"].initial = Times.objects.filter(selected=True)
+        else:
+            self.fields['status'].choices = [('', '선택해 주세요.'), (Cookies.Cookie_Status.waiting, '판매 대기중'), (Cookies.Cookie_Status.out, '시즌 종료')]

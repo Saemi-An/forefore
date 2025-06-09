@@ -2,9 +2,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes  # noqa: F401
 from rest_framework.response import Response
 
-from core.products.models import Cookies
+from core.products.models import Cookies, Sales
 
-from .serializers import CookiesSerializer
+from .serializers import CookiesSerializer, SalesCookieSerializer
 
 # from rest_framework.permissions import IsAdminUser, IsAuthenticated  # noqa: F401
 
@@ -23,4 +23,10 @@ def get_routes(request):
 def get_cookie(request, pk):
     cookie = get_object_or_404(Cookies, id=pk)
     serializer = CookiesSerializer(cookie)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_cookie_sales(request):
+    sales = get_object_or_404(Sales, id=1)
+    serializer = SalesCookieSerializer(sales)
     return Response(serializer.data)

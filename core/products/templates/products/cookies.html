@@ -15,11 +15,11 @@
     <div class="modal__cnt__txt">
       <div>
         <p class="md-reg">관리자 페이지에서</p>
-        <p class="md-reg"><span class="md-bold txt-color-orange">선택된 픽업시간이 초기화 됩니다.</span></p>
+        <p class="md-reg"><span class="md-bold txt-color-blue">선택된 픽업시간이 초기화 됩니다.</span></p>
       </div>
       <div>
         <p class="md-reg">사용자 페이지에서</p>
-        <p class="md-reg"><span class="md-bold txt-color-orange">픽업 시간 선택란이 초기화 됩니다.</span></p>
+        <p class="md-reg"><span class="md-bold txt-color-blue">픽업 시간 선택란이 초기화 됩니다.</span></p>
       </div>
       <div>
         <p class="md-reg">오늘의 구움과자 판매를</p>
@@ -47,9 +47,9 @@
 </div>
 <!-- 폼 모달 -->
 <div class="modal" id="formModal">
-  <form action="" method="POST" class="modal__form" id="addCookieForm">
+  <form action="{% url 'cookies_add' 0 %}" method="POST" class="modal__form" id="addCookieForm">
     {% csrf_token %}
-    <p class="lg-bold">⚡️ 판매 상품 추가 ⚡️</p>
+    <p class="lg-bold" id="addCookieFormTitle">⚡️ 판매 상품 추가 ⚡️</p>
     <div class="modal__form__cnt">
       <div class="modal__form__cnt__elem">
         <div class="modal__form__cnt__elem__sub-title">
@@ -61,7 +61,6 @@
           <option value="{{ id }}" {% if id in form.registered %}disabled{% endif %}>{{ name }}</option>
         {% endfor %}
         </select>
-        {% comment %} {{ form.product }} {% endcomment %}
         <span class="sm-reg txt-color-orange mgl4 display-none" id="selectProductMsg"></span>
       </div>
       <div class="modal__form__cnt__elem">
@@ -97,6 +96,7 @@
     </div>
   </form>
 </div>
+{% if not sales %}
 <!-- 픽업 폼 모달 -->
 <div class="modal" id="pickupModal">
   <form action="{% url 'cookies_pickups_add' %}" method="POST" class="modal__pickup" id="pickupModalForm">
@@ -122,6 +122,7 @@
     </div>
   </form>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block main %}
@@ -133,7 +134,7 @@
     <div class="search__mid">
       <div class="search__mid__box">
         <p class="md-bold">판매 상태</p>
-        <input type="text" class="md-bold search__mid__box no-input txt-color-{% if sales %}orange{% else %}navy{% endif %}" value="{% if sales %}예약 가능{% else %}예약 종료{% endif %}">
+        <input type="text" class="md-bold search__mid__box no-input txt-color-{% if sales %}orange{% else %}navy{% endif %}" value="{% if sales %}예약 판매중{% else %}예약 판매 종료{% endif %}">
       </div>
       <div class="search__mid__box">
         <p class="md-bold">픽업 시간</p>
@@ -148,12 +149,14 @@
     </div>
     <!-- 버튼 -->
     <div class="search__btn align right">
+      {% if not sales %}
       <button class="emoji-btn {% if sales %}on-sale{% endif %}" onclick="showPickupModal()">
         <div class="div_with_emoji">
           <span class="md-reg emoji_mgb02">⏱️</span>
-          <span class="md-reg">픽업 시간 추가</span>
+          <span class="md-reg">픽업 시간 {% if selected_times %}수정{% else %}추가{% endif %}</span>
         </div>
       </button>
+      {% endif %}
       <button class="emoji-btn green" onclick="showNormalModal()">
         <div class="div_with_emoji">
           <span class="md-reg emoji_mgb02">🛍️</span>
@@ -228,8 +231,8 @@
           <td class="md-reg">{{ cookie.index }}</td>
           <td class="md-reg">
             <div class="table__table__index">
-              <button class="table__table__index__thumb" onclick="location.href='{% url 'change_cookies_index' cookie.product.category 'up' cookie.index %}'">👍🏽</button>
-              <button class="table__table__index__thumb" onclick="location.href='{% url 'change_cookies_index' cookie.product.category 'down' cookie.index %}'">👎🏼</button>
+              <button class="table__table__index__thumb" onclick="location.href='{% url 'change_cookies_index' cookie.index 'up' %}'">👍🏽</button>
+              <button class="table__table__index__thumb" onclick="location.href='{% url 'change_cookies_index' cookie.index 'down' %}'">👎🏼</button>
             </div>
           </td>
           {% endif %}
@@ -255,7 +258,9 @@
           <td class="">
             <div class="table__table__functions">
               <button class="lg-reg" onclick="location.href='{% url 'cookies_view' cookie.id %}'">👀</button>
-              <button class="lg-reg" onclick="getEditCookieModal({{cookie.id}})">✍🏽</button>
+              {% if not sales or cookie.status == 1 %}
+              <button class="lg-reg" onclick="showEditFormModal({{cookie.id}})">✍🏽</button>
+              {% endif %}
               <button class="lg-reg" onclick="location.href='{% url 'cookies_delete' cookie.id %}'">🗑️</button>
             </div>
           </td>

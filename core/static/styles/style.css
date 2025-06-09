@@ -233,6 +233,9 @@ body {
 .txt-color-navy {
   color: #22228C;
 }
+.txt-color-blue {
+  color: #6666c8;
+}
 
 .align {
   display: flex;
@@ -317,6 +320,12 @@ body {
 }
 .colorbook__box.orange080 {
   background-color: rgba(255, 133, 0, 0.8);
+}
+.colorbook__box.navy {
+  background-color: #22228C;
+}
+.colorbook__box.blue {
+  background-color: #6666c8;
 }
 .colorbook__box.beige00 {
   background-color: #FFFCF5;
