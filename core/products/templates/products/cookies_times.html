@@ -55,17 +55,23 @@
     <!-- 하단 -->
     <div class="align center">
       <ul class="table__paging">
-        <li class="align center"><button class="lg-bold">👈🏽</button></li>
+      {% if times.has_previous %}
+        <li class="align center"><button class="lg-bold" onclick="location.href='?page=1'" title="처음으로">👈🏽</button></li>
+      {% endif %}
 
-        <li><button class="align center md-reg table__paging__btn">3</button></li>
-        <li><button class="align center md-reg table__paging__btn">4</button></li>
-        <li><button class="align center md-reg table__paging__btn">5</button></li>
-        <li><button class="align center md-reg table__paging__btn active">6</button></li>
-        <li><button class="align center md-reg table__paging__btn">7</button></li>
-        <li><button class="align center md-reg table__paging__btn">8</button></li>
-        <li><button class="align center md-reg table__paging__btn">9</button></li>
+      {% for page_num in times.paginator.page_range %}
+        {% if page_num >= times.number|add:-4 and page_num <= times.number|add:4 %}
+        {% if page_num == times.number %}
+        <li><button class="align center md-reg table__paging__btn active" onclick="location.href='?page={{ page_num }}'">{{ page_num }}</button></li>
+        {% else %}
+        <li><button class="align center md-reg table__paging__btn" onclick="location.href='?page={{ page_num }}'">{{ page_num }}</button></li>
+        {% endif %}
+        {% endif %}
+      {% endfor %}
 
-        <li class="align center"><button class="lg-bold">👉🏽</button></li>
+      {% if times.has_next %}
+        <li class="align center"><button class="lg-bold" onclick="location.href='?page={{ times.paginator.num_pages }}'" title="마지막으로">👉🏽</button></li>
+      {% endif %}
       </ul>
     </div>
   </div>

@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404
 from urllib.parse import urlparse
+from django.core.paginator import Paginator
+
 
 from .models import Cookies, Sales
 
@@ -23,13 +25,16 @@ def match_category_from_int_to_str(int_type):
     
 def match_category_from_str_to_int(str_type):
     if str_type == 'financier':
-        return 0
-    elif str_type == 'cakepiece':
         return 1
-    elif str_type == 'scone':
+    elif str_type == 'cakepiece':
         return 2
-    elif str_type == 'todays-menu':
+    elif str_type == 'scone':
         return 3
+    elif str_type == 'todays-menu':
+        return 4
+    elif str_type == 'all':
+        return 0
+    # 이거 추후에 지우기
     else:
         return 100
 
@@ -51,3 +56,9 @@ def get_referer(request, fallback):
         referer = f'/{fallback}/'
 
     return referer
+
+def get_paginated_objects(request, queryset):
+    page = request.GET.get('page', '1')   # url에서 page값 가져옴(index의 경우 디폴트 '1')
+    paginator = Paginator(queryset, 10)   # 페이지당 10개씩 보여주기
+    page_obj = paginator.get_page(page)   # 해당 페이지의 데이터만 조회하도록 쿼리 (데이터 전체 조회 X)
+    return page_obj

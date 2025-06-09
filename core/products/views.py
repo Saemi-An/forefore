@@ -1,12 +1,11 @@
-from urllib.parse import urlparse
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
-from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.core.paginator import Paginator
 
 from .forms import CookieAdd, ProductAdd, TimeAdd
 from .models import Cookies, Products, Sales, Times
-from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer, match_category_from_int_to_str
+from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer, match_category_from_int_to_str, get_paginated_objects
 
 
 def cookies(request, category='all'):
@@ -145,22 +144,18 @@ def cookies_delete(request, pk):
     return redirect(referer)
 
 
-def cookies_products(request, category='all'):
-    int_category = match_category_from_str_to_int(category)
-    if int_category == 100:
-        products = Products.objects.all().order_by('id')
+def cookies_products(request, str_category='all'):
+    int_category = match_category_from_str_to_int(str_category)
+    if int_category:
+        products = Products.objects.filter(category=int_category).order_by('id')
     else:
-        products = Products.objects.filter(category=int_category).order_by('id')
-
-    if request.method == 'POST':
-        int_category = int(request.POST['product_category'])
-        products = Products.objects.filter(category=int_category).order_by('id')
-        str_category = match_category_from_int_to_str(int_category)
-        return redirect('cookies_products', str_category)
+        products = Products.objects.all().order_by('id')
+            
+    page_obj = get_paginated_objects(request, products)
 
     context = {
-        'products': products,
-        'selected_category': int_category,
+        'products': page_obj,
+        'selected_category': str_category,
     }
 
     return render(request, 'products/cookies_products.html', context)
@@ -173,39 +168,25 @@ def cookies_products_view(request, pk):
     return render(request, 'products/cookies_products_view.html', context)
 
 
-def cookies_products_add(request):
-    form = ProductAdd()
-    referer = get_referer(request, 'cookies-products')
-
+def cookies_products_add_and_edit(request, pk=None):
+    product = get_object_or_404(Products, id=pk) if pk else None
     if request.method == 'POST':
-        redirect_url = request.POST['redirect_url']
-        
-        form = ProductAdd(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, '성공적으로 저장 되었습니다.')
-            return redirect(redirect_url)
-    context = {'form': form, 'referer': referer}
-
-    return render(request, 'products/cookies_products_add.html', context)
-
-
-def cookies_products_edit(request, pk):
-    product = get_object_or_404(Products, id=pk)
-    form = ProductAdd(instance=product)
-    referer = get_referer(request, 'cookies-products')
-
-    if request.method == 'POST':
-        redirect_url = request.POST['redirect_url']
-        
         form = ProductAdd(request.POST, request.FILES, instance=product)
+        redirect_url = request.POST.get('redirect_url', '/manager/cookies-products/')
+
         if form.is_valid():
             form.save()
             messages.success(request, '성공적으로 저장 되었습니다.')
             return redirect(redirect_url)
-
-    context = {'form': form, 'product': product, 'referer': referer}
-
+    else:
+        form = ProductAdd(instance=product)
+        referer = get_referer(request, 'cookies-products')
+    
+    context = {
+        'form': form,
+        'product': product,
+        'referer': referer if request.method == 'GET' else None
+    }
     return render(request, 'products/cookies_products_add.html', context)
 
 
@@ -225,7 +206,9 @@ def cookies_products_delete(request, pk):
 
 def cookies_times(request):
     times = Times.objects.all().order_by('name', 'start', 'end')
-    context = {'times': times}
+    page_obj = get_paginated_objects(request, times)
+    
+    context = {'times': page_obj}
 
     return render(request, 'products/cookies_times.html', context)
 
@@ -237,55 +220,46 @@ def cookies_times_view(request, pk):
     return render(request, 'products/cookies_times_view.html', context)
 
 
-def cookies_times_add(request):
-    form = TimeAdd()
-
-    if request.method == 'POST':
-        form = TimeAdd(request.POST)
-        if form.is_valid():
-            instance = form.save()
-            messages.success(request, '성공적으로 저장 되었습니다.')
-            return redirect('cookies_times_view', pk=instance.id)
-
-    context = {'form': form}
-
-    return render(request, 'products/cookies_times_add.html', context)
-
-
-def cookies_times_edit(request, pk):
-    time = get_object_or_404(Times, id=pk)
-    form = TimeAdd(instance=time)
-
+def cookies_times_add_and_edit(request, pk=None):
+    time = get_object_or_404(Times, id=pk) if pk else None
     if request.method == 'POST':
         form = TimeAdd(request.POST, instance=time)
+        redirect_url = request.POST.get('redirect_url', '/manager/cookies-times/')
+
         if form.is_valid():
             form.save()
             messages.success(request, '성공적으로 저장 되었습니다.')
-            return redirect('cookies_times_view', pk=time.id)
-
-    context = {'form': form, 'time': time}
+            return redirect(redirect_url)
+    else:
+        form = TimeAdd(instance=time)
+        referer = get_referer(request, 'cookies-times')
+    
+    context = {
+        'form': form,
+        'time': time,
+        'referer': referer if request.method == 'GET' else None
+    }
 
     return render(request, 'products/cookies_times_add.html', context)
 
 
 def cookies_times_delete(request, pk):
+    referer = get_referer(request, 'cookies-products')
     time = get_object_or_404(Times, id=pk)
+
     try:
         time.delete()
         messages.success(request, '성공적으로 삭제 되었습니다.')
+    # 유저가 주문서 작성 도중에 삭제하는 경우 - 삭제 못하게 막아둠
     except ProtectedError:
         messages.error(request, '해당 픽업시간은 현재 사용중으로 삭제할 수 없습니다.')
 
-        # 유저가 주문서 작성 도중에 삭제하는 경우 - 삭제 못하게 막아둠
-
-    return redirect('cookies_times')
+    return redirect(referer)
 
 
+# 테스트용: 추후 삭제 필요
 def test(request):
-    if request.method == 'POST':
-
-        referer = get_referer(request, 'cookies')
-        return redirect(referer)
+    pass
 
     return render(request, 'products/test.html')
 

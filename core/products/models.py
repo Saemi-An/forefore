@@ -22,10 +22,10 @@ class Products(models.Model):
         db_table = 'Products'
 
     class Cookie_Categories(models.IntegerChoices):
-        financier = 0, '휘낭시에'
-        cakepiece = 1, '조각케이크'
-        scone = 2, '스콘'
-        todaysmenu = 3, '오늘의 메뉴'
+        financier = 1, '휘낭시에'
+        cakepiece = 2, '조각케이크'
+        scone = 3, '스콘'
+        todaysmenu = 4, '오늘의 메뉴'
 
     category = models.PositiveIntegerField(choices=Cookie_Categories.choices)
     name = models.CharField(max_length=100)  # 30
@@ -62,21 +62,21 @@ class Cookies(models.Model):
         # 새상품 등록시에만 index 자동 부여 ------------------------------------------------
         if self._state.adding:
 
-            if self.product.category == 0:
+            if self.product.category == 1:
                 total = Cookies.objects.filter(product__category=0).count()
                 if total == 0:
                     self.index = 101
                 else:
                     self.index = 101 + total
 
-            elif self.product.category == 1:
+            elif self.product.category == 2:
                 total = Cookies.objects.filter(product__category=1).count()
                 if total == 0:
                     self.index = 201
                 else:
                     self.index = 201 + total
 
-            elif self.product.category == 2:
+            elif self.product.category == 3:
                 total = Cookies.objects.filter(product__category=2).count()
                 if total == 0:
                     self.index = 301
