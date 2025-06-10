@@ -70,7 +70,7 @@
         </ul>
       </div>
       <div class="nav__section">
-        <div class="nav__section__title align both">
+        <div class="nav__section__title align both" onclick="location.href='{% url 'test' %}'">
           <div class="div_with_emoji">
             <span class="lg-bold emoji_mgb02">🎂</span>
             <span class="md-bold">홀케이크</span>
@@ -84,14 +84,14 @@
         </ul>
       </div>
       <div class="nav__section">
-        <div class="nav__section__title align both active">
+        <div class="nav__section__title align both {% if '/cookies' in request.path %}active{% endif %}" onclick="showCookieSection()" id="cookieDiv">
           <div class="div_with_emoji">
             <span class="lg-bold">🍪</span>
             <span class="md-bold">구움과자</span>
           </div>
-          <span class="lg-bold">📖</span>
+          <span class="lg-bold" id="cookieDivIcon">{% if '/cookies' in request.path %}📖{% else %}📘{% endif %}</span>
         </div>
-        <ul class="nav__section__title__sub">
+        <ul class="nav__section__title__sub {% if '/cookies' not in request.path %}display-none{% endif %}" id="cookieSubMenu">
           <li class="nav__section__title__sub-title md-reg {% if '/cookies/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies' 'all' %}'">구움과자 판매</li>
           <li class="nav__section__title__sub-title md-reg {% if '/cookies-products/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies_products' 'all' %}'">구움과자 상품</li>
           <li class="nav__section__title__sub-title md-reg {% if '/cookies-times/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cookies_times' %}'">구움과자 픽업시간</li>

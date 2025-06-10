@@ -1,8 +1,4 @@
-function submitForm(event) {
-    event.preventDefault();
-    
-    const productFilterForm = document.getElementById('productFilterForm');
+function getFilteredProducts() {
     const stringFilter = document.querySelector('select[name="product_category"]').value;
-    productFilterForm.action = `/manager/cookies-products/${stringFilter}/`;
-    productFilterForm.submit();
+    location.href=`/manager/cookies-products/${stringFilter}/`;
 }

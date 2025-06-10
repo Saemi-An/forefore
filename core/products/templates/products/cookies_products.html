@@ -9,37 +9,34 @@
 
 {% block main %}
 <!-- 검색 섹션 -->
-<form action="" id="productFilterForm">
-  {% csrf_token %}
-  <section class="paper">
-    <div class="search">
-      <p class="lg-bold">검색</p>
-      <!-- 인풋 -->
-      <div class="search__mid">
-        <div class="search__mid__box">
-          <p class="md-bold">상품 유형</p>
-          <select name="product_category" id="" class="md-reg search__mid__box">
-            <option value="all" class="md-reg" {% if selected_category == 'all' %}selected{% endif %}>선택해 주세요.</option>
-            <option value="financier" {% if selected_category == 'financier' %}selected{% endif %} class="md-reg">휘낭시에</option>
-            <option value="cakepiece" {% if selected_category == 'cakepiece' %}selected{% endif %} class="md-reg">조각케이크</option>
-            <option value="scone" {% if selected_category == 'scone' %}selected{% endif %} class="md-reg">스콘</option>
-            <option value="todays-menu" {% if selected_category == 'todays-menu' %}selected{% endif %} class="md-reg">오늘의 메뉴</option>
-          </select>
-        </div>
-      </div>
-      <!-- 버튼 -->
-      <div class="search__btn align right">
-        <button type="button" class="md-reg btn-normal txt-color-green" onclick="location.href='{% url 'cookies_products' 'all' %}'">초기화</button>
-        <button type="button" class="emoji-btn green" onclick="submitForm(event)">
-          <div class="div_with_emoji">
-            <span class="md-reg emoji_mgb02">🔍</span>
-            <span class="md-reg txt-color-white">검색</span>
-          </div>
-        </button>
+<section class="paper">
+  <div class="search">
+    <p class="lg-bold">검색</p>
+    <!-- 인풋 -->
+    <div class="search__mid">
+      <div class="search__mid__box">
+        <p class="md-bold">상품 유형</p>
+        <select name="product_category" id="" class="md-reg search__mid__box">
+          <option value="all" class="md-reg" {% if selected_category == 'all' %}selected{% endif %}>선택해 주세요.</option>
+          <option value="financier" {% if selected_category == 'financier' %}selected{% endif %} class="md-reg">휘낭시에</option>
+          <option value="cakepiece" {% if selected_category == 'cakepiece' %}selected{% endif %} class="md-reg">조각케이크</option>
+          <option value="scone" {% if selected_category == 'scone' %}selected{% endif %} class="md-reg">스콘</option>
+          <option value="todays-menu" {% if selected_category == 'todays-menu' %}selected{% endif %} class="md-reg">오늘의 메뉴</option>
+        </select>
       </div>
     </div>
-  </section>
-</form>
+    <!-- 버튼 -->
+    <div class="search__btn align right">
+      <button type="button" class="md-reg btn-normal txt-color-green" onclick="location.href='{% url 'cookies_products' 'all' %}'">초기화</button>
+      <button type="button" class="emoji-btn green" onclick="getFilteredProducts()">
+        <div class="div_with_emoji">
+          <span class="md-reg emoji_mgb02">🔍</span>
+          <span class="md-reg txt-color-white">검색</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</section>
 
 <!-- 테이블 섹션 -->
 <section class="paper">

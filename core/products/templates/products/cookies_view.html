@@ -1,5 +1,65 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load customtags %}
+
+{% block script %}
+<script src="{% static 'js/products/cookies_view.js' %}" defer></script>
+{% endblock %}
+
+{% block modal %}
+<!-- 폼 모달 -->
+<div class="modal" id="formModal">
+  <form action="{% url 'cookies_add' cookie.pk %}" method="POST" class="modal__form" id="addCookieForm">
+    {% csrf_token %}
+    <p class="lg-bold" id="addCookieFormTitle">⚡️ 판매 상품 수정 ⚡️</p>
+    <div class="modal__form__cnt">
+      <div class="modal__form__cnt__elem">
+        <div class="modal__form__cnt__elem__sub-title">
+          <p class="md-bold">판매 상품</p>
+          <span class="md-bold txt-color-orange">*</spans>
+        </div>
+        <select name="product" class="md-reg add_md-reg_class_to_options no-select" id="selectProduct">
+          {% for id, name in form.fields.product.choices %}
+          <option value="{{ id }}" {% if id in form.registered %}disabled{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+        <span class="sm-reg txt-color-orange mgl4 display-none" id="selectProductMsg"></span>
+      </div>
+      <div class="modal__form__cnt__elem">
+        <div class="modal__form__cnt__elem__sub-title">
+          <p class="md-bold">노출 상태</p>
+          <span class="md-bold txt-color-orange">*</spans>
+        </div>
+        {{ form.status }}
+        <span class="sm-reg txt-color-orange mgl4 display-none" id="selectStatusMsg"></span>
+      </div>
+      <div class="modal__form__cnt__elem-double">
+        <div class="modal__form__cnt__elem">
+          <div class="modal__form__cnt__elem__sub-title">
+            <p class="md-bold">전체 재고 수량</p>
+            <span class="md-bold txt-color-orange">*</spans>
+          </div>
+          {{ form.total }}
+          <span class="sm-reg txt-color-orange mgl4 display-none" id="inputTotalMsg"></span>
+        </div>
+        <div class="modal__form__cnt__elem">
+          <div class="modal__form__cnt__elem__sub-title">
+            <p class="md-bold">안전 재고 수량</p>
+            <span class="md-bold txt-color-orange">*</spans>
+            </div>
+            {{ form.safe }}
+            <span class="sm-reg txt-color-orange mgl4 display-none" id="inputSafeMsg"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal__form__btn">
+      <button type="button" class="md-reg btn-normal txt-color-green" onclick="closeFormModal()">취소하기</button>
+      <button type="submit" class="md-reg btn-green txt-color-white" onclick="submitCookieAdd(event)">저장하기</button>
+      <input type="hidden" name="redirect_url" value="{{ referer }}">
+    </div>
+  </form>
+</div>
+{% endblock %}
 
 {% block main %}
 <section class="paper">
@@ -40,11 +100,11 @@
           <p class="md-reg">
           {% if cookie.status == 0 %}
             ⚪️ {{ cookie.get_status_display }}   <!-- 판매 대기중 -->
-          {% elif cookies.status == 1 %}
+          {% elif cookie.status == 1 %}
             🟢 {{ cookie.get_status_display }}   <!-- 판매중 -->
-          {% elif cookies.status == 2 %}
+          {% elif cookie.status == 2 %}
             🟡 {{ cookie.get_status_display }}   <!-- 재고 소진 -->
-          {% elif cookies.status == 3 %}
+          {% elif cookie.status == 3 %}
             ⚫️ {{ cookie.get_status_display }}   <!-- 시즌 종료 -->
           {% endif %}
           </p>
@@ -74,18 +134,24 @@
 <section class="align both">
   <button class="md-reg btn-normal txt-color-green" onclick="goBack()">뒤로가기</button>
   <div class="view-btn">
-    <button class="emoji-btn green" onclick="location.href='{% url 'cookies_products_edit' cookie.pk %}'">
+    {% if not sales or sales and cookie.status == 1 %}
+    <button class="emoji-btn green" onclick="showFormModal({{ cookie.pk }})">
       <div class="div_with_emoji">
         <span class="md-reg emoji_mgb04">✍🏽</span>
         <span class="md-reg txt-color-white">수정하기</span>
       </div>
     </button>
-    <button class="emoji-btn green" onclick="location.href='{% url 'cookies_delete' cookie.id %}'">
-      <div class="div_with_emoji">
-        <span class="md-reg emoji_mgb04">🗑️</span>
-        <span class="md-reg txt-color-white">삭제하기</span>
-      </div>
-    </button>
+    {% endif %}
+    <form method="POST" action="{% url 'cookies_delete' cookie.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="emoji-btn green">
+        <div class="div_with_emoji">
+          <span class="md-reg emoji_mgb04">🗑️</span>
+          <span class="md-reg txt-color-white">삭제하기</span>
+        </div>
+      </button>
+      <input type="hidden" name="redirect_url" value="{{ referer }}">
+    </form>
   </div>
 </section>
 {% endblock %}

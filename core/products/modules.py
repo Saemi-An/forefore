@@ -11,6 +11,7 @@ def get_cookie_sales():
     cookie_salse = get_object_or_404(Sales, pk=1).on_sale
     return cookie_salse
 
+# 현재 사용 안함
 def match_category_from_int_to_str(int_type):
     if int_type == 0:
         return 'financier'
@@ -34,9 +35,6 @@ def match_category_from_str_to_int(str_type):
         return 4
     elif str_type == 'all':
         return 0
-    # 이거 추후에 지우기
-    else:
-        return 100
 
 def change_cookie_index(idx, target_idx):
     if Cookies.objects.filter(index=target_idx):

@@ -14,7 +14,15 @@ document.getElementById('hamburgerIcon').addEventListener('click', () => {
 })
 
 // ===================================== nav 컨트롤 =====================================
+function showCookieSection() {
+    const cookieDiv = document.getElementById('cookieDiv');
+    cookieDiv.classList.add('active');
+    const cookieDivIcon = document.getElementById('cookieDivIcon');
+    cookieDivIcon.innerText = '📖';
+    const cookieSubMenu = document.getElementById('cookieSubMenu');
+    cookieSubMenu.style.display = 'block';
 
+}
 // ===================================== 공통 =====================================
 // 뒤로가기 버튼
 function goBack() {history.back();}

@@ -102,17 +102,21 @@
   <form action="{% url 'cookies_pickups_add' %}" method="POST" class="modal__pickup" id="pickupModalForm">
     {% csrf_token %}
     <p class="lg-bold">⚡️ 픽업 시간 추가 ⚡️</p>
-    <div class="modal__pickup__elem">
-      <div class="modal__pickup__elem__subtitle">
+    <div class="modal__pickup__body">
+      <div class="modal__pickup__body__subtitle">
         <p class="md-bold">픽업 시간</p>
         <span class="md-bold txt-color-orange">*</spans>
       </div>
-      {% for time in times %}
-      <button type="button" class="modal__pickup__elem__checkbox" onclick="selectPickupTimes(event, {{ time.id }})">
-        <div class="btn-check_{% if time.selected %}on{% else %}off{% endif %}" data-selected="{{ time.id }}"></div>
-        <span class="md-reg">{{ time.name }}</span>
-      </button>
-      {% endfor %}
+      
+      <div class="modal__pickup__body__cnt">
+        {% for time in times %}
+        <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="selectPickupTimes(event, {{ time.id }})">
+          <div class="btn-check_{% if time.selected %}on{% else %}off{% endif %}" data-selected="{{ time.id }}"></div>
+          <span class="md-reg">{{ time.name }}</span>
+        </button>
+        {% endfor %}
+      </div>
+      
       <span class="sm-reg txt-color-orange mgl4 display-none" id="checkSelectedMsg">필수 입력값 입니다.</span>
     </div>
     <div class="modal__cnt__btn">
@@ -182,11 +186,11 @@
     </div>
     <!-- 구움과자 필터 -->
     <ul class="table__tab">
-      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 100 %}active{% endif %}" onclick="location.href='{% url 'cookies' 'all' %}'">🍀 전체</button></li>
-      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 0%}active{% endif %}" onclick="location.href='{% url 'cookies' 'financier' %}'">🧈 휘낭시에</button></li>
-      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 1%}active{% endif %}" onclick="location.href='{% url 'cookies' 'cakepiece' %}'">🍰 조각케이크</button></li>
-      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 2%}active{% endif %}" onclick="location.href='{% url 'cookies' 'scone' %}'">🥮 스콘</button></li>
-      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 3%}active{% endif %}" onclick="location.href='{% url 'cookies' 'todays-menu' %}'">🥨 오늘의 메뉴</button></li>
+      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 'all' %}active{% endif %}" onclick="location.href='{% url 'cookies' 'all' %}'">🍀 전체</button></li>
+      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 'financier' %}active{% endif %}" onclick="location.href='{% url 'cookies' 'financier' %}'">🧈 휘낭시에</button></li>
+      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 'cakepiece' %}active{% endif %}" onclick="location.href='{% url 'cookies' 'cakepiece' %}'">🍰 조각케이크</button></li>
+      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 'scone' %}active{% endif %}" onclick="location.href='{% url 'cookies' 'scone' %}'">🥮 스콘</button></li>
+      <li><button class="md-reg table__tab__filter {% if sales %}on-sale{% endif %} {% if filter == 'todays-menu' %}active{% endif %}" onclick="location.href='{% url 'cookies' 'todays-menu' %}'">🥨 오늘의 메뉴</button></li>
     </ul>
     <!-- 중단 -->
     <table class="table__table">
@@ -271,17 +275,23 @@
     <!-- 하단 -->
     <div class="align center">
       <ul class="table__paging">
-        <li class="align center"><button class="lg-bold">👈🏽</button></li>
+      {% if cookies.has_previous %}
+        <li class="align center"><button class="lg-bold" onclick="location.href='?page=1'" title="처음으로">👈🏽</button></li>
+      {% endif %}
 
-        <li><button class="align center md-reg table__paging__btn">3</button></li>
-        <li><button class="align center md-reg table__paging__btn">4</button></li>
-        <li><button class="align center md-reg table__paging__btn">5</button></li>
-        <li><button class="align center md-reg table__paging__btn active">6</button></li>
-        <li><button class="align center md-reg table__paging__btn">7</button></li>
-        <li><button class="align center md-reg table__paging__btn">8</button></li>
-        <li><button class="align center md-reg table__paging__btn">9</button></li>
+      {% for page_num in cookies.paginator.page_range %}
+        {% if page_num >= cookies.number|add:-4 and page_num <= cookies.number|add:4 %}
+        {% if page_num == cookies.number %}
+        <li><button class="align center md-reg table__paging__btn active" onclick="location.href='?page={{ page_num }}'">{{ page_num }}</button></li>
+        {% else %}
+        <li><button class="align center md-reg table__paging__btn" onclick="location.href='?page={{ page_num }}'">{{ page_num }}</button></li>
+        {% endif %}
+        {% endif %}
+      {% endfor %}
 
-        <li class="align center"><button class="lg-bold">👉🏽</button></li>
+      {% if cookies.has_next %}
+        <li class="align center"><button class="lg-bold" onclick="location.href='?page={{ cookies.paginator.num_pages }}'" title="마지막으로">👉🏽</button></li>
+      {% endif %}
       </ul>
     </div>
   </div>

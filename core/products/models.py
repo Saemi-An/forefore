@@ -63,32 +63,32 @@ class Cookies(models.Model):
         if self._state.adding:
 
             if self.product.category == 1:
-                total = Cookies.objects.filter(product__category=0).count()
-                if total == 0:
+                total = Cookies.objects.filter(product__category=1).count()
+                if total:
                     self.index = 101
                 else:
                     self.index = 101 + total
 
             elif self.product.category == 2:
-                total = Cookies.objects.filter(product__category=1).count()
-                if total == 0:
-                    self.index = 201
-                else:
+                total = Cookies.objects.filter(product__category=2).count()
+                if total:
                     self.index = 201 + total
+                else:
+                    self.index = 201
 
             elif self.product.category == 3:
-                total = Cookies.objects.filter(product__category=2).count()
-                if total == 0:
-                    self.index = 301
-                else:
+                total = Cookies.objects.filter(product__category=3).count()
+                if total:
                     self.index = 301 + total
+                else:
+                    self.index = 301
 
             else:
-                total = Cookies.objects.filter(product__category=3).count()
-                if total == 0:
-                    self.index = 401
-                else:
+                total = Cookies.objects.filter(product__category=4).count()
+                if total:
                     self.index = 401 + total
+                else:
+                    self.index = 401
 
         # [시즌 종료] 상태라면, current_stock은 null ------------------------------------------------
         # if self.status == 3:
@@ -103,7 +103,7 @@ class Cookies(models.Model):
         super().save(*args, **kwargs)  # 상태 변경 후 다시 저장
 
     def __str__(self):
-        return f'{self.pk} | {self.product.name}'
+        return f'{self.pk} | {self.product.name} | 인덱스: {self.index}'
 
 
 class Times(models.Model):

@@ -1007,17 +1007,25 @@ body {
   align-items: center;
   gap: 2.4rem;
 }
-.modal__pickup__elem {
+.modal__pickup__body {
   display: flex;
   flex-direction: column;
   align-items: start;
   gap: 0.8rem;
 }
-.modal__pickup__elem__subtitle {
+.modal__pickup__body__subtitle {
   display: flex;
   gap: 0.4rem;
 }
-.modal__pickup__elem__checkbox {
+.modal__pickup__body__cnt {
+  max-height: 16.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 0.4rem;
+  overflow-y: auto;
+}
+.modal__pickup__body__cnt__checkbox {
   display: flex;
   align-items: center;
   gap: 0.4rem;

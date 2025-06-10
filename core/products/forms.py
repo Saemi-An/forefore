@@ -202,7 +202,7 @@ class CookieAdd(forms.ModelForm):
         sales = Sales.objects.get(id=1).on_sale
 
         if sales:
-            self.fields['status'].choices = [('', '선택해 주세요.'), (Cookies.Cookie_Status.on_sale, '판매중'), (Cookies.Cookie_Status.out, '시즌 종료')]
+            self.fields['status'].choices = [('', '선택해 주세요.'), (Cookies.Cookie_Status.on_sale, '판매중'), (Cookies.Cookie_Status.sold_out, '재고 소진')]
 
             # existing_classes_from_total = self.fields['total'].widget.attrs.get('class', '')
             # self.fields['total'].widget.attrs['class'] = f'{existing_classes_from_total} no-input'

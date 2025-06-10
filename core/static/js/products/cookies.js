@@ -148,7 +148,6 @@ function submitCookieAdd(event) {
 // 수정폼 변경사항
 function fillInEditForm(beforeSubmit, data) {
     const selectProduct = document.getElementById('selectProduct');
-    const selectStatus = document.getElementById('selectStatus');
     const inputTotal = document.getElementById('inputTotal');
     const inputSafe = document.getElementById('inputSafe');
     const addCookieForm = document.getElementById('addCookieForm');
@@ -224,6 +223,7 @@ function showEditFormModal(pk) {
     })
 }
 
+// 구움과자 판매 상태 GET 요청
 async function getCookieSalesStatus() {
     const response = await fetch('/api/cookie-sales-status', {   // '/'로 시작하는 절대경로
         method: 'GET',

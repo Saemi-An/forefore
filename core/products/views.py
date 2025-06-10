@@ -1,28 +1,28 @@
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
-from django.core.paginator import Paginator
 
 from .forms import CookieAdd, ProductAdd, TimeAdd
 from .models import Cookies, Products, Sales, Times
-from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer, match_category_from_int_to_str, get_paginated_objects
+from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer, get_paginated_objects
 
 
 def cookies(request, category='all'):
     int_category = match_category_from_str_to_int(category)
-    if int_category == 100:
-        cookies = Cookies.objects.all().order_by('index')
-    else:
+    if int_category:
         cookies = Cookies.objects.filter(product__category=int_category).order_by('index')
+    else:
+        cookies = Cookies.objects.all().order_by('index')
 
+    page_obj = get_paginated_objects(request, cookies)
     sales = get_cookie_sales()
     times = Times.objects.all().order_by('name', 'start', 'end')
     selected_times = Times.objects.filter(selected=True).order_by('name', 'start', 'end')
     form = CookieAdd()
 
     context = {
-        'filter': int_category,
-        'cookies': cookies,
+        'filter': category,
+        'cookies': page_obj,
         'sales': sales,
         'times': times,
         'selected_times': selected_times,
@@ -30,6 +30,7 @@ def cookies(request, category='all'):
     }
 
     return render(request, 'products/cookies.html', context)
+
 
 def change_cookies_sale(request):
     referer = get_referer(request, 'cookies')
@@ -63,6 +64,7 @@ def change_cookies_sale(request):
 
     return redirect(referer)
 
+
 def cookies_pickups_add(request):
     referer = get_referer(request, 'cookies')
 
@@ -87,7 +89,8 @@ def cookies_pickups_add(request):
     else:
         messages.error(request, f'잘못된 접근 경로 입니다.')
         return redirect(referer)
-    
+
+
 def change_cookies_index(request, idx, action):
     referer = get_referer(request, 'cookies')
 
@@ -107,22 +110,28 @@ def change_cookies_index(request, idx, action):
     
     return redirect(referer)
 
+
 def cookies_view(request, pk):
     cookie = get_object_or_404(Cookies, id=pk)
-    context = {'cookie': cookie}
+    referer = get_referer(request, 'cookies')   # 뷰페이지에서 수정할 경우 
+    sales = get_cookie_sales()
+    form = CookieAdd()
+    context = {
+        'cookie': cookie,
+        'referer': referer,
+        'sales': sales,
+        'form': form
+    }
 
     return render(request, 'products/cookies_view.html', context)
 
-# add, edit 합쳐놓음
-def cookies_add(request, pk=None):
-    referer = get_referer(request, 'cookies')
 
+def cookies_add_and_edit(request, pk=None):
+    cookie = get_object_or_404(Cookies, id=pk) if pk else None
     if request.method == 'POST':
-        if pk:
-            cookie = get_object_or_404(Cookies, id=pk)
-            form = CookieAdd(request.POST, instance=cookie)
-        else:
-            form = CookieAdd(request.POST)
+        view_referer = request.POST.get('redirect_url', None)   # 뷰페이지에서 수정시 전전페이지 url
+        referer = view_referer if view_referer else get_referer(request, 'cookies')   # view referer 없으면 cookies 페이지 refer 사용
+        form = CookieAdd(request.POST, instance=cookie)
 
         if form.is_valid():
             valid_form = form.save(commit=False)
@@ -132,12 +141,15 @@ def cookies_add(request, pk=None):
                 valid_form.current = 0
             valid_form.save()
             messages.success(request, '성공적으로 저장 되었습니다.')
+            return redirect(referer)
 
-    messages.error(request, f'잘못된 접근 경로 입니다.')
-    return redirect(referer)
 
 def cookies_delete(request, pk):
-    referer = get_referer(request, 'cookies')
+    if request.method == 'POST':
+        referer = request.POST.get('redirect_url', '/manager/cookies/')
+    else:
+        referer = get_referer(request, 'cookies')
+    
     cookie = get_object_or_404(Cookies, id=pk)
     cookie.delete()
     messages.success(request, '성공적으로 삭제 되었습니다.')
@@ -163,7 +175,8 @@ def cookies_products(request, str_category='all'):
 
 def cookies_products_view(request, pk):
     product = get_object_or_404(Products, id=pk)
-    context = {'product': product}
+    referer = get_referer(request, 'cookies-products')
+    context = {'product': product, 'referer': referer}
 
     return render(request, 'products/cookies_products_view.html', context)
 
@@ -191,7 +204,11 @@ def cookies_products_add_and_edit(request, pk=None):
 
 
 def cookies_products_delete(request, pk):
-    referer = get_referer(request, 'cookies-products')
+    if request.method == 'POST':
+        referer = request.POST.get('redirect_url', '/manager/cookies-products/')
+    else:
+        referer = get_referer(request, 'cookies-products')
+
     product = get_object_or_404(Products, id=pk)
     try:
         product.delete()
