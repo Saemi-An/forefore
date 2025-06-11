@@ -1,1 +1,74 @@
 {% extends 'base.html' %}
+
+{% block main %}
+<ul>
+  {% for obj in objs %}
+  <li>
+    <span>{{ obj.pk }}.</span>
+    <span>{{ obj }}</span>
+  </li>  
+  {% endfor %}
+</ul>
+
+<!-- 날짜 폼 -->
+<div class="form__group__elem">
+  <div class="gorm__group__elem__sub-title">
+    <span class="md-bold">예약 시작 날짜</span>
+    <span class="md-bold txt-color-orange">*</span>
+  </div>
+  <input type="date" class="md-reg">
+</div>
+
+<!-- 예약 요일 폼 -->
+<form method="POST" action="{% url 'test' %}" id="testForm">
+  {% csrf_token %}
+  <div>{{ form.name }}</div>
+  <!-- 요일 -->
+  <div class="modal__pickup__body">
+    <div class="modal__pickup__body__subtitle">
+      <p class="md-bold">예약 요일</p>
+      <span class="md-bold txt-color-orange">*</spans>
+    </div>
+    
+    <div class="modal__pickup__body__cnt">
+      {% for elem in form.days %}
+      <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="checkDays(this)">
+        <div class="btn-check_off" data-selected="{{ elem.data.value }}"></div>
+        <span class="md-reg">{{ elem.choice_label }}</span>
+      </button>
+      {% endfor %}
+    </div>
+    
+    <span class="sm-reg txt-color-orange mgl4 display-none" id="checkSelectedMsg">필수 입력값 입니다.</span>
+  </div>
+  <button type="submit" onclick="submitForm(event)">POST 요청</button>
+  <input type="hidden" name="selected_days" id="selectedDays" value="">
+</form>
+
+<script>
+
+function checkDays(elem) {
+  const checkbox = elem.firstElementChild;
+  if (checkbox.classList.contains('btn-check_off')) {
+    checkbox.classList.replace('btn-check_off', 'btn-check_on');
+  } else {
+    checkbox.classList.replace('btn-check_on', 'btn-check_off');
+  }
+};
+
+function submitForm(event) {
+  event.preventDefault();
+  let stringSelectedDays = '';
+  const checkedBoxes = document.querySelectorAll('.btn-check_on');
+  checkedBoxes.forEach(box => {
+    stringSelectedDays += ` ${box.dataset['selected']}`
+  })
+
+  document.getElementById('selectedDays').value = stringSelectedDays;
+
+  document.getElementById('testForm').submit();
+}
+
+</script>
+
+{% endblock %}

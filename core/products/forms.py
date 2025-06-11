@@ -1,7 +1,9 @@
 from django import forms
 
-from .models import Cookies, Products, Sales, Times
-
+from .models import Sales
+from .models import Products, Times, Cookies
+from .models import Schedules
+from .models import BitDays
 
 class ProductAdd(forms.ModelForm):
 
@@ -212,3 +214,75 @@ class CookieAdd(forms.ModelForm):
 
         else:
             self.fields['status'].choices = [('', '선택해 주세요.'), (Cookies.Cookie_Status.waiting, '판매 대기중'), (Cookies.Cookie_Status.out, '시즌 종료')]
+
+
+# ==============================================================
+# *************************** 홀케이크 ***************************
+# ==============================================================
+
+class SchedulesForm(forms.ModelForm):
+    
+    days = forms.MultipleChoiceField(
+        choices = Schedules.SchedulesDays.choices,
+        widget = forms.CheckboxSelectMultiple,
+        required = False,
+    )
+
+    class Meta:
+        model = Schedules
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 기존 인스턴스의 비트마스크 값을 읽어 체크박스 초기값 설정
+        # 현재 인스턴스의 비트마스크에 포함된 요일들의 value list를 만들어 days 필드의 초기값으로 넣음
+        if self.instance and self.instance.pk:
+            self.initial['days'] = [
+                day.value for day in Schedules.SchedulesDays
+                if self.instance.days & (1 << day.value)   # 해당 요일이 비트마스크에 포함되어 있는가
+            ]
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        selected_days = cleaned_data.get('days', [])
+        # 선택된 요일을 비트마스크로 변환하여 저장
+        bitmask = 0
+        for day in selected_days:
+            bitmask |= (1 << int(day))
+        cleaned_data['days'] = bitmask   # 비트마스크 값으로 변환된 정수(bitmask)를 모델의 'days' 필드에 저장
+        return cleaned_data
+
+
+# 장고 어드민 테스트용
+class BitDaysForm(forms.ModelForm):
+    
+    days = forms.MultipleChoiceField(
+        choices = BitDays.BitDaysEnum.choices,
+        widget = forms.CheckboxSelectMultiple,
+        required = False,
+        label = '요일 선택'
+    )
+
+    class Meta:
+        model = BitDays
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 기존 인스턴스의 비트마스크 값을 읽어 체크박스 초기값 설정
+        # 현재 인스턴스의 비트마스크에 포함된 요일들의 value list를 만들어 days 필드의 초기값으로 넣음
+        if self.instance and self.instance.pk:
+            self.initial['days'] = [
+                day.value for day in BitDays.BitDaysEnum
+                if self.instance.days & (1 << day.value)   # 해당 요일이 비트마스크에 포함되어 있는가
+            ]
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        selected_days = cleaned_data.get('days', [])
+        # 선택된 요일을 비트마스크로 변환하여 저장
+        bitmask = 0
+        for day in selected_days:
+            bitmask |= (1 << int(day))
+        cleaned_data['days'] = bitmask   # 비트마스크 값으로 변환된 정수(bitmask)를 모델의 'days' 필드에 저장
+        return cleaned_data

@@ -2,8 +2,8 @@ from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import CookieAdd, ProductAdd, TimeAdd
-from .models import Cookies, Products, Sales, Times
+from .forms import CookieAdd, ProductAdd, TimeAdd, BitDaysForm
+from .models import Cookies, Products, Sales, Times, BitDays
 from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer, get_paginated_objects
 
 
@@ -276,7 +276,28 @@ def cookies_times_delete(request, pk):
 
 # 테스트용: 추후 삭제 필요
 def test(request):
-    pass
+    if request.method == 'POST':
+        form = BitDaysForm(request.POST)
+        if form.is_valid():
+            schedule_obj = form.save(commit=False)
 
-    return render(request, 'products/test.html')
+            str_days = request.POST.get('selected_days').strip()
+            lst_days = list(map(int, str_days.split())) # ['1', '2', '10'] --> [1, 2, 10]
+            bitmask = 0
+            for elem in lst_days:
+                bitmask |= 1 << elem
+            
+            schedule_obj.days = bitmask
+            form.save()
+            return redirect('test')
+    else:
+        form = BitDaysForm()
+        objs = BitDays.objects.all().order_by('pk')
+
+    context = {
+        'objs': objs,
+        'form': form,
+    }
+
+    return render(request, 'products/test.html', context)
 
