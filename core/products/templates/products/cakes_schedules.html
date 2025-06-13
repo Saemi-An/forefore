@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load customtags %}
+
+{% block main %}
+<section class="paper">
+  <div class="table">
+    <!-- 상단 -->
+    <div class="align both table__top">
+      <span class="lg-bold">픽업시간 목록</span>
+      <button class="emoji-btn green" onclick="location.href='{% url 'cakes_schedules_add' 0 %}'">
+        <div class="div_with_emoji">
+          <span class="lg-reg emoji_mgb02">✨</span>
+          <span class="md-reg txt-color-white">픽업시간 추가</span>
+        </div>
+      </button>
+    </div>
+    <!-- 중단 -->
+    <table class="table__table">
+      <colgroup>
+        <col style="width: 5%;">  <!-- 번호 -->
+        <col style="width: 35%;">  <!-- 픽업시간 이름 -->
+        <col style="width: 15%;">  <!-- 예약 시작일 -->
+        <col style="width: 15%;">  <!-- 예약 마감일 -->
+        <col style="width: 15%;">  <!-- 예약 가능 요일 -->
+        <col style="width: 12%;">  <!-- 기능 -->
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="md-bold">번호</th>
+          <th class="md-bold">픽업시간 이름</th>
+          <th class="md-bold">예약 시작일</th>
+          <th class="md-bold">예약 마감일</th>
+          <th class="md-bold">예약 가능 요일</th>
+          <th class="md-bold">기능</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for schedule in schedules %}
+        <tr>
+          <td class="md-reg">{{ forloop.counter }}</td>
+          <td class="md-reg">{{ schedule.name }}</td>
+          <td class="md-reg">{{ schedule.start_date | format_date }}</td>
+          <td class="md-reg">{{ schedule.end_date | format_date }}</td>
+          <td class="md-reg">{{ schedule.days | get_days_from_bitmask }}</td>
+          <td>
+            <div class="table__table__functions">
+              <button class="lg-reg" onclick="location.href='{% url 'cakes_schedules_view' schedule.pk %}'">👀</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cakes_schedules_add' schedule.pk %}'">✍🏽</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cakes_schedules_delete' schedule.pk %}'">🗑️</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <!-- 하단 -->
+    <div class="align center">
+      <ul class="table__paging">
+      {% if schedules.has_previous %}
+        <li class="align center"><button class="lg-bold" onclick="location.href='?page=1'" title="처음으로">👈🏽</button></li>
+      {% endif %}
+
+      {% for page_num in schedules.paginator.page_range %}
+        {% if page_num >= schedules.number|add:-4 and page_num <= schedules.number|add:4 %}
+        {% if page_num == schedules.number %}
+        <li><button class="align center md-reg table__paging__btn active" onclick="location.href='?page={{ page_num }}'">{{ page_num }}</button></li>
+        {% else %}
+        <li><button class="align center md-reg table__paging__btn" onclick="location.href='?page={{ page_num }}'">{{ page_num }}</button></li>
+        {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      {% if schedules.has_next %}
+        <li class="align center"><button class="lg-bold" onclick="location.href='?page={{ schedules.paginator.num_pages }}'" title="마지막으로">👉🏽</button></li>
+      {% endif %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

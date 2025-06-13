@@ -774,7 +774,7 @@ body {
   grid-template-columns: 1fr 1fr;
   column-gap: 1.6rem;
 }
-.form__group__elem__time select {
+.form__group__elem__time select, .form__group__elem__time input {
   width: 14rem;
 }
 

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<form method="POST" {% if option %}action="{% url 'cakes_options_add' option.pk %}"{% endif %} class="column_24">
+  {% csrf_token %}
+  <section class="paper">
+    <p class="lg-bold">옵션 {% if option %}수정{% else %}등록{% endif %}</p>
+    <section class="form">
+      <p class="lg-bold form__title">정보</p>
+      <div class="form__group">
+
+        <div class="form__group__elem">
+          <div class="gorm__group__elem__sub-title">
+            <span class="md-bold">옵션 유형</span>
+            <span class="md-bold txt-color-orange">*</span>
+          </div>
+          {{ form.type }}
+          {% if form.type.errors %}<span class="sm-reg txt-color-orange mgl4">{{ form.type.errors }}</span>{% endif %}
+        </div>
+
+        <div class="form__group__elem">
+          <div class="gorm__group__elem__sub-title">
+            <span class="md-bold">옵션명</span>
+            <span class="md-bold txt-color-orange">*</span>
+          </div>
+          {{ form.name }}
+          {% if form.name.errors %}<span class="sm-reg txt-color-orange mgl4">{{ form.name.errors }}</span>{% endif %}
+        </div>
+
+        <div class="form__group__elem">
+          <div class="gorm__group__elem__sub-title">
+            <span class="md-bold">옵션 가격</span>
+            <span class="md-bold txt-color-orange">*</span>
+          </div>
+          {{ form.price }}
+          {% if form.price.errors %}<span class="sm-reg txt-color-orange mgl4">{{ form.price.errors }}</span>{% endif %}
+        </div>
+        
+      </div>
+    </section>        
+  </section>
+
+  <section class="align both">
+    <button type="button" class="md-reg btn-normal txt-color-green" onclick="goBack()">뒤로가기</button>
+    <div class="view-btn">
+      <button type="submit" class="emoji-btn green">
+        <div class="div_with_emoji">
+          <span class="md-reg emoji_mgb04">👍🏽</span>
+          <span type="submit" class="md-reg txt-color-white">저장하기</span>
+          <input type="hidden" name="redirect_url" value="{{ referer }}">
+        </div>
+      </button>
+    </div>
+  </section>
+</form>
+{% endblock %}

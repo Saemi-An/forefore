@@ -46,7 +46,7 @@
     </button>
     <form method="POST" action="{% url 'cookies_products_delete' product.pk %}">
       {% csrf_token %}
-      <button class="emoji-btn green" onclick="location.href='{% url 'cookies_products_delete' product.pk %}'">
+      <button class="emoji-btn green">
         <div class="div_with_emoji">
           <span class="md-reg emoji_mgb04">🗑️</span>
           <span class="md-reg txt-color-white">삭제하기</span>

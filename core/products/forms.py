@@ -1,8 +1,10 @@
+from datetime import date
+
 from django import forms
 
 from .models import Sales
 from .models import Products, Times, Cookies
-from .models import Schedules
+from .models import Options, Schedules, Cakes
 from .models import BitDays
 
 class ProductAdd(forms.ModelForm):
@@ -219,7 +221,141 @@ class CookieAdd(forms.ModelForm):
 # ==============================================================
 # *************************** 홀케이크 ***************************
 # ==============================================================
+class OptionAdd(forms.ModelForm):
 
+    class Meta:
+        model = Options
+        fields = '__all__'
+        widgets = {
+            'type': forms.Select(attrs={
+                'class': 'md-reg add_md-reg_class_to_options'
+            }),
+            'name': forms.TextInput(attrs={
+                'class': 'md-reg',
+                'placeholder': '입력해 주세요.'
+            }),
+            'price': forms.NumberInput(attrs={
+                'class': 'md-reg',
+                'placeholder': '입력해 주세요.'
+            })
+        }
+
+    # 커스텀
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['type'].required = False
+        self.fields['name'].required = False
+        self.fields['price'].required = False
+
+        # type 드롭다운 기본값 커스텀
+        choices = self.fields['type'].choices
+        if choices and choices[0][0] == '':
+            self.fields['type'].choices = [('', '선택해 주세요.')] + list(choices[1:])
+
+    # 유효성 검사
+    def clean(self):
+        cleaned_data = super().clean()
+        type = cleaned_data.get('type')
+        name = cleaned_data.get('name')
+        price = cleaned_data.get('price')
+
+        if not type:
+            self.add_error('type', '필수 입력값 입니다.')
+        if not name:
+            self.add_error('name', '필수 입력값 입니다.')
+        if not price:
+            self.add_error('price', '필수 입력값 입니다.')
+
+
+class ScheduleAdd(forms.ModelForm):
+    class Meta:
+        model = Schedules
+        fields = '__all__'
+        widgets = {
+            'name':
+                forms.TextInput(attrs={
+                    'class': 'md-reg',
+                    'placeholder': '입력해 주세요.'
+                }),
+            'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'md-reg'}),
+            'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'md-reg'}),
+            'days': forms.HiddenInput(attrs={'id': 'hiddenDaysInput'}),
+            'start_time':
+                forms.Select(
+                    choices=[('', '선택')] + [(i, f'{i}시') for i in range(10, 20)],
+                    attrs={'class': 'md-reg add_md-reg_class_to_options'}
+                ),
+            'end_time':
+                forms.Select(
+                    choices=[('', '선택')] + [(i, f'{i}시') for i in range(10, 20)],
+                    attrs={'class': 'md-reg add_md-reg_class_to_options'}
+                ),
+            'interval': forms.Select(attrs={'class': 'md-reg add_md-reg_class_to_options'})
+            }
+    
+    # 커스텀
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].required = False
+        self.fields['start_date'].required = False
+        self.fields['end_date'].required = False        
+        self.fields['days'].required = False
+        self.fields['start_time'].required = False
+        self.fields['end_time'].required = False    
+        self.fields['interval'].required = False    
+        
+        # interval 드롭다운 기본값 커스텀
+        choices = self.fields['interval'].choices
+        if choices and choices[0][0] == '':
+            self.fields['interval'].choices = [('', '선택해 주세요.')] + list(choices[1:])
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        start_date = cleaned_data.get('start_date')
+        end_date = cleaned_data.get('end_date')
+        days = cleaned_data.get('days')
+        start_time = cleaned_data.get('start_time')
+        end_time = cleaned_data.get('end_time')
+        interval = cleaned_data.get('interval')
+
+        # name 필드
+        if not name:
+            self.add_error('name', '필수 입력값 입니다.')
+        elif len(name) >= 30:
+            self.add_error('name', '공백 포함 최대 30자 까지 입력 가능합니다.')
+        
+        # start_date, end_date 필드
+        if not start_date:
+            self.add_error('start_date', '필수 입력값 입니다.')
+        elif not end_date:
+            self.add_error('end_date', '필수 입력값 입니다.')
+        elif end_date < date.today():
+            self.add_error('end_date', '마지막 날짜가 예약이 불가능한 과거 입니다.')
+        elif start_date > end_date:
+            self.add_error('start_date', '시작 날짜와 마지막 날짜를 확인해 주세요.')
+
+        # days 필드
+        if not days:
+            self.add_error('days', '필수 입력값 입니다.')
+            
+        # start_time, end_time 필드
+        if not start_time:
+            self.add_error('start_time', '필수 입력값 입니다.')
+        elif not end_time:
+            self.add_error('end_time', '필수 입력값 입니다.')
+        elif start_time > end_time:
+            self.add_error('start_time', '시작 시간과 마감 시간을 확인해 주세요.')
+            
+        # interval 필드
+        if not interval:
+            self.add_error('interval', '필수 입력값 입니다.')
+        
+
+
+
+# 장고 어드민용
 class SchedulesForm(forms.ModelForm):
     
     days = forms.MultipleChoiceField(
@@ -252,6 +388,7 @@ class SchedulesForm(forms.ModelForm):
         cleaned_data['days'] = bitmask   # 비트마스크 값으로 변환된 정수(bitmask)를 모델의 'days' 필드에 저장
         return cleaned_data
 
+# ------------------------------- 테스트용, 추후 삭제 필요
 
 # 장고 어드민 테스트용
 class BitDaysForm(forms.ModelForm):
@@ -286,3 +423,31 @@ class BitDaysForm(forms.ModelForm):
             bitmask |= (1 << int(day))
         cleaned_data['days'] = bitmask   # 비트마스크 값으로 변환된 정수(bitmask)를 모델의 'days' 필드에 저장
         return cleaned_data
+
+# 테스트용. 추후 삭제 필요
+class TestForm(forms.ModelForm):
+    class Meta:
+        model = BitDays
+        fields = '__all__'
+        widgets = {
+            'days': forms.HiddenInput()
+        }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name', '')
+        selected_days = cleaned_data.get('days', [])
+        print(selected_days)
+        print(type(selected_days))
+
+        if not name:
+            self.add_error('name', '필수 입력값 입니다.')
+
+        # if selected_days:
+        #     # 선택된 요일을 비트마스크로 변환하여 저장
+        #     bitmask = 0
+        #     for day in selected_days:
+        #         bitmask |= (1 << int(day))
+        #     cleaned_data['days'] = bitmask   # 비트마스크 값으로 변환된 정수(bitmask)를 모델의 'days' 필드에 저장
+        # else:
+        #     self.add_error('days', '필수 입력값 입니다.')

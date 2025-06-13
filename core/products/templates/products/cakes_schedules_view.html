@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load customtags %}
+
+{% block main %}
+<section class="paper">
+  <div class="view">
+    <p class="lg-bold">픽업시간 열람</p>
+      <section class="view__sect">
+        <p class="lg-bold view__sect__title">정보</p>
+
+        <div class="view__sect__body">
+          <div class="view__sect__body__row">
+            <p class="md-bold">픽업시간 이름</p>
+            <p class="md-reg">{{ schedule.name }}</p>
+          </div>
+          <div class="view__sect__body__row">
+            <p class="md-bold">예약 가능 날짜</p>
+            <p class="md-reg">{{ schedule.start_date | format_date }} ~ {{ schedule.end_date | format_date}}</p>
+          </div>
+          <div class="view__sect__body__row">
+            <p class="md-bold">예약 가능 요일</p>
+            <p class="md-reg">{{ schedule.days | get_days_from_bitmask }}</p>
+          </div>
+          <div class="view__sect__body__row">
+            <p class="md-bold">예약 가능 시간</p>
+            <p class="md-reg">{{ schedule.start_time }}시 ~ {{ schedule.end_time }}시</p>
+          </div>
+          <div class="view__sect__body__row">
+            <p class="md-bold">예약 시간 간격</p>
+            <p class="md-reg">{{ schedule.interval }}분</p>
+          </div>
+          <div class="view__sect__body__row">
+            <p class="md-bold">사용중</p>
+            <p class="sm-reg">{% if is_being_used %}⭕️{% else %}❌{% endif %}</p>
+          </div>
+        </div>
+      </section>
+  </div>
+</section>
+
+<section class="align both">
+  <button class="md-reg btn-normal txt-color-green" onclick="goBack()">뒤로가기</button>
+  <div class="view-btn">
+    <button class="emoji-btn green" onclick="location.href='{% url 'cakes_schedules_add' schedule.pk %}'">
+      <div class="div_with_emoji">
+        <span class="md-reg emoji_mgb04">✍🏽</span>
+        <span class="md-reg txt-color-white">수정하기</span>
+      </div>
+    </button>
+    <form method="POST" action="{% url 'cakes_schedules_delete' schedule.pk %}">
+      {% csrf_token %}
+      <button class="emoji-btn green">
+        <div class="div_with_emoji">
+          <span class="md-reg emoji_mgb04">🗑️</span>
+          <span class="md-reg txt-color-white">삭제하기</span>
+        </div>
+      </button>
+      <input type="hidden" name="redirect_url" value="{{ referer }}">
+    </form>
+  </div>
+</section>
+{% endblock %}

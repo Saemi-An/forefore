@@ -1,4 +1,19 @@
 {% extends 'base.html' %}
+{% block script %}
+<style>
+.hidden-checkbox {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+</style>
+{% endblock %}
 
 {% block main %}
 <ul>
@@ -10,16 +25,30 @@
   {% endfor %}
 </ul>
 
-<!-- 날짜 폼 -->
-<div class="form__group__elem">
-  <div class="gorm__group__elem__sub-title">
-    <span class="md-bold">예약 시작 날짜</span>
-    <span class="md-bold txt-color-orange">*</span>
-  </div>
-  <input type="date" class="md-reg">
-</div>
+<!-- 그냥 폼 -->
+<form method="POST" action="{% url 'test2' %}" id="test2Form">
+  {% csrf_token %}
+  <h1>그냥 폼</h1>
+  <div>{{ test_form.name }}</div>
+  {% if form.name.errors %}<span>{{ form.name.errors }}</span>{% endif %}
 
-<!-- 예약 요일 폼 -->
+  <button type="button" class="" onclick="checkDays(this)" style="display: flex" data-selected="0">
+    <div class="btn-check_off" data-selected="0"></div>
+    <span class="md-reg">월요일</span>
+  </button>
+  
+  <button type="button" class="" onclick="checkDays(this)" style="display: flex" data-selected="1">
+    <div class="btn-check_off" data-selected="1"></div>
+    <span class="md-reg">화요일</span>
+  </button>
+  <p style="color: red;">{{ test_form.days.errors }}</p>
+
+  <button type="submit" onclick="test2Submit(event)">POST 요청</button>
+  {{ test_form.days }}
+
+</form>
+
+<!-- 수동 렌더링 폼 -->
 <form method="POST" action="{% url 'test' %}" id="testForm">
   {% csrf_token %}
   <div>{{ form.name }}</div>
@@ -42,13 +71,13 @@
     <span class="sm-reg txt-color-orange mgl4 display-none" id="checkSelectedMsg">필수 입력값 입니다.</span>
   </div>
   <button type="submit" onclick="submitForm(event)">POST 요청</button>
-  <input type="hidden" name="selected_days" id="selectedDays" value="">
+  <input type="hidden" name="days" id="selectedDays" value="">
 </form>
 
 <script>
-
 function checkDays(elem) {
   const checkbox = elem.firstElementChild;
+
   if (checkbox.classList.contains('btn-check_off')) {
     checkbox.classList.replace('btn-check_off', 'btn-check_on');
   } else {
@@ -67,6 +96,21 @@ function submitForm(event) {
   document.getElementById('selectedDays').value = stringSelectedDays;
 
   document.getElementById('testForm').submit();
+}
+
+function test2Submit(event) {
+  event.preventDefault();
+
+  let result = 0;
+  const checkedBoxes = document.querySelectorAll('.btn-check_on');
+  checkedBoxes.forEach(box => {
+    result += parseInt(box.dataset['selected'])
+  })
+  const id_days = document.getElementById('id_days');
+  id_days.value = result;
+
+  const test2Form = document.getElementById('test2Form');
+  test2Form.submit();
 }
 
 </script>

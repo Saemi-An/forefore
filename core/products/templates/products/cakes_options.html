@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load customtags %}
+
+{% block script %}
+<script src="{% static 'js/products/cakes_options.js' %}" defer></script>
+{% endblock %}
+
+
+{% block main %}
+<!-- 검색 섹션 -->
+<section class="paper">
+  <div class="search">
+    <p class="lg-bold">검색</p>
+    <!-- 인풋 -->
+    <div class="search__mid">
+      <div class="search__mid__box">
+        <p class="md-bold">옵션 유형</p>
+        <select name="option_types" id="" class="md-reg search__mid__box">
+          <option value="all" class="md-reg" {% if selected_type == 'all' %}selected{% endif %}>선택해 주세요.</option>
+          <option value="size" {% if selected_type == 'size' %}selected{% endif %} class="md-reg">호수</option>
+          <option value="add_fruite" {% if selected_type == 'add_fruite' %}selected{% endif %} class="md-reg">과일 추가</option>
+          <option value="mix_fruite" {% if selected_type == 'mix_fruite' %}selected{% endif %} class="md-reg">과일 믹스</option>
+          <option value="change_cream" {% if selected_type == 'change_cream' %}selected{% endif %} class="md-reg">생크림 변경</option>
+          <option value="change_sheet" {% if selected_type == change_sheet %}selected{% endif %} class="md-reg">시트 변경</option>
+          <option value="choco_glassage" {% if selected_type == 'choco_glassage' %}selected{% endif %} class="md-reg">초코 글라사쥬</option>
+        </select>
+      </div>
+    </div>
+    <!-- 버튼 -->
+    <div class="search__btn align right">
+      <button type="button" class="md-reg btn-normal txt-color-green" onclick="location.href='{% url 'cakes_options' 'all' %}'">초기화</button>
+      <button type="button" class="emoji-btn green" onclick="getFilteredOptions()">
+        <div class="div_with_emoji">
+          <span class="md-reg emoji_mgb02">🔍</span>
+          <span class="md-reg txt-color-white">검색</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- 테이블 섹션 -->
+<section class="paper">
+  <div class="table">
+    <!-- 상단 -->
+    <div class="align both table__top">
+      <span class="lg-bold">옵션 목록</span>
+      <button class="emoji-btn green" onclick="location.href='{% url 'cakes_options_add' 0 %}'">
+        <div class="div_with_emoji">
+          <span class="lg-reg emoji_mgb02">✨</span>
+          <span class="md-reg txt-color-white">옵션 추가</span>
+        </div>
+      </button>
+    </div>
+    <!-- 중단 -->
+    <table class="table__table">
+      <colgroup>
+        <col style="width: 5%;">  <!-- 순서 -->
+        <col style="width: 20%;">  <!-- 상품유형 -->
+        <col style="width: 40%;">  <!-- 상품명 -->
+        <col style="width: 20%;">  <!-- 가격 -->
+        <col style="width: 12%;">  <!-- 기능 -->
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="md-bold">번호</th>
+          <th class="md-bold">옵션 유형</th>
+          <th class="md-bold">옵션명</th>
+          <th class="md-bold">옵션 가격</th>
+          <th class="md-bold">기능</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for option in options %}
+        <tr>
+          <td class="md-reg">{{ forloop.counter }}</td>
+          <td class="md-reg">{{ option.get_type_display }}</td>
+          <td class="md-reg">{{ option.name }}</td>
+          <td class="md-reg">{{ option.price | intcomma }}원</td>
+          <td class="">
+            <div class="table__table__functions">
+              <button class="lg-reg" onclick="location.href='{% url 'cakes_options_view' option.id %}'">👀</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cakes_options_add' option.id %}'">✍🏽</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cakes_options_delete' option.id %}'">🗑️</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <!-- 하단 -->
+    <div class="align center">
+      <ul class="table__paging">
+      {% if options.has_previous %}
+        <li class="align center"><button class="lg-bold" onclick="location.href='?page=1'" title="처음으로">👈🏽</button></li>
+      {% endif %}
+
+      {% for page_num in options.paginator.page_range %}
+        {% if page_num >= options.number|add:-4 and page_num <= options.number|add:4 %}
+        {% if page_num == options.number %}
+        <li><button class="align center md-reg table__paging__btn active" onclick="location.href='?page={{ page_num }}'">{{ page_num }}</button></li>
+        {% else %}
+        <li><button class="align center md-reg table__paging__btn" onclick="location.href='?page={{ page_num }}'">{{ page_num }}</button></li>
+        {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      {% if options.has_next %}
+        <li class="align center"><button class="lg-bold" onclick="location.href='?page={{ options.paginator.num_pages }}'" title="마지막으로">👉🏽</button></li>
+      {% endif %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

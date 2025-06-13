@@ -1,7 +1,9 @@
 from django.db import models
 
 
-# =================================== 공통 ===================================
+# ==============================================================
+# *************************** 공통 ***************************
+# ==============================================================
 class Sales(models.Model):
 
     class Meta:
@@ -14,7 +16,9 @@ class Sales(models.Model):
     #     return '판매중' if self.on_sale else '판매 종료'
 
 
-# =================================== 구움과자 ===================================
+# ==============================================================
+# *************************** 구움과자 ***************************
+# ==============================================================
 class Products(models.Model):
 
     class Meta:
@@ -135,7 +139,9 @@ class Pickups(models.Model):
         return f'{self.str_time} / {self.reserved} / 참조: {self.time}'
 
 
-# =================================== 홀케이크 ===================================
+# ==============================================================
+# *************************** 홀케이크 ***************************
+# ==============================================================
 class Options(models.Model):
 
     class Meta:
@@ -238,8 +244,15 @@ class CakeOptions(models.Model):
     class Meta:
         db_table = 'CakeOptions'
     
-    cake = models.ForeignKey(Cakes, on_delete=models.CASCADE)
-    option = models.ForeignKey(Options, on_delete=models.CASCADE)
+    cake = models.ForeignKey(Cakes, on_delete=models.PROTECT)
+    option = models.ForeignKey(Options, on_delete=models.PROTECT)
+    # on_delete 동작 방식: FK 선언된 모델 기준. 즉, FK가 어떤 객체를 참조하고 있다면, 그 참조 대상이 삭제될 때의 동작을 지정함.
+    # option = models.ForeignKey(Options, on_delete=models.CASCADE)
+    # 위와 같이 설정되어 있다면, Options 모델에서 인스턴스가 삭제된다면, CakeOptions 모델에서 삭제된 인스턴스를 참조하는 모든 인스턴스들이 같이 삭제됨.
+    
+    # 반면 아래와 같이 설정된 경우,
+    # option = models.ForeignKey(Options, on_delete=models.PROTECT)
+    # Options 모델의 인스턴스가 참조되고 있는 경우, 해당 인스턴스는 참조되고 있기 때문에 삭제가 불가하게 됨.
     
     def __str__(self):
         return f'케이크: {self.cake.name}, {self.cake.pk} / 옵션들: {self.option.name}'   # 이거 출력 어떻게됨?
