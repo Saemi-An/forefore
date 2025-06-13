@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load customtags %}
+
+
+{% block modal %}
+<!-- 일반 모달 -->
+<div class="modal" id="normalModal">
+  <div class="modal__cnt">
+    {% if sales %}
+    <p class="lg-bold">🌙 예약 판매 마감 🌙</p>
+    <div class="modal__cnt__txt">
+      <div>
+        <p class="md-reg">관리자 페이지에서</p>
+        <p class="md-reg"><span class="md-bold txt-color-blue">선택된 픽업시간이 초기화 됩니다.</span></p>
+      </div>
+      <div>
+        <p class="md-reg">사용자 페이지에서</p>
+        <p class="md-reg"><span class="md-bold txt-color-blue">픽업 시간 선택란이 초기화 됩니다.</span></p>
+      </div>
+      <div>
+        <p class="md-reg">오늘의 구움과자 판매를</p>
+        <p class="md-reg">종료 하시겠습니까?</p>
+      </div>
+    </div>
+    {% else %}
+    <p class="lg-bold">✨ 예약 판매 시작 ✨</p>
+    <div class="modal__cnt__txt">
+      <div>
+        <p class="md-reg">판매 중에는</p>
+        <p class="md-reg"><span class="md-bold txt-color-orange">픽업시간 변경이 불가능</span> 합니다.</p>
+      </div>
+      <div>
+        <p class="md-reg">오늘의 구움과자 판매를</p>
+        <p class="md-reg">시작 하시겠습니까?</p>
+      </div>
+    </div>
+    {% endif %}
+    <div class="modal__cnt__btn">
+      <button type="button" class="md-reg btn-normal txt-color-green" onclick="closeNormalModal()">취소</button>
+      <button class="md-reg btn-green txt-color-white" onclick="location.href='{% url 'change_cookies_sale' %}'">확인</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block main %}
+<!-- 검색 섹션 -->
+<section class="paper {% if sales %}on-sale{% endif %}">
+  <div class="search">
+    <p class="lg-bold">판매 설정</p>
+    <!-- 인풋 -->
+    <div class="search__mid">
+      <div class="search__mid__box">
+        <p class="md-bold">판매 상태</p>
+        <input type="text" class="md-bold search__mid__box no-input txt-color-{% if sales %}orange{% else %}navy{% endif %}" value="{% if sales %}예약 판매중{% else %}예약 판매 종료{% endif %}">
+      </div>
+    </div>
+    <!-- 버튼 -->
+    <div class="search__btn align right">
+      <button class="emoji-btn green" onclick="showNormalModal()">
+        <div class="div_with_emoji">
+          <span class="md-reg emoji_mgb02">🛍️</span>
+          <span class="md-reg txt-color-white">판매 상태 변경</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- 테이블 섹션 -->
+<section class="paper {% if sales %}on-sale{% endif %}">
+  <div class="table">
+    <!-- 상단 -->
+    <div class="align both table__top">
+      <span class="lg-bold">판매 상품 목록</span>
+      <button class="emoji-btn green" onclick="location.href='{% url 'cakes_add_and_edit' 0 %}'">
+        <div class="div_with_emoji">
+          <span class="lg-reg emoji_mgb02">✨</span>
+          <span class="md-reg txt-color-white">판매 상품 추가</span>
+        </div>
+      </button>
+    </div>
+    <!-- 중단 -->
+    <table class="table__table">
+      <colgroup>
+        <col style="width: 5%;">  <!-- 순서 -->
+        <col style="width: 10%;">  <!-- 순서 변경 -->
+        <col style="width: 7%;">  <!-- 이미지 -->
+
+        <col style="width: 18%;">  <!-- 상품명 -->
+        <col style="width: 30%;">  <!-- 픽업 시간 -->
+        <col style="width: 18%;">  <!-- 노출 상태 -->
+
+        <col style="width: 12%;">  <!-- 기능 -->
+      </colgroup>
+      <thead {% if sales %}class="on-sale"{% endif %}>
+        <tr>
+          <th class="md-bold">순서</th>
+          <th class="md-bold">순서 변경</th>
+          <th class="md-bold">이미지</th>
+          <th class="md-bold">상품명</th>
+          <th class="md-bold">노출 상태</th>
+          <th class="md-bold">픽업 시간</th>
+          <th class="md-bold">기능</th>
+        </tr>
+      </thead>
+      <tbody {% if sales %}class="on-sale"{% endif %}>
+        {% for cake in cakes %}
+        <tr>
+          <td class="md-reg">{{ cake.index }}</td>
+          <td class="md-reg">
+            <div class="table__table__index">
+              <button class="table__table__index__thumb" onclick="location.href='{% url 'change_cookies_index' cake.index 'up' %}'">👍🏽</button>
+              <button class="table__table__index__thumb" onclick="location.href='{% url 'change_cookies_index' cake.index 'down' %}'">👎🏼</button>
+            </div>
+          </td>
+          <td>
+            <img src="/admin_media/{{ cake.img }}" alt="" class="table__table__img">
+          </td>
+          <td class="md-reg">{{ cake.name }}</td>
+          <td class="md-reg">여기 스케쥴'들' 들어갈 곳</td>
+          <td class="md-reg">
+            {% if cake.display == 0 %}
+              ⚪️ {{ cake.get_display_display }}   <!-- 판매 대기중 -->
+            {% elif cake.display == 1 %}
+              🟢 {{ cake.get_display_display }}   <!-- 판매중 -->
+            {% elif cake.display == 2 %}
+              🟡 {{ cake.get_display_display }}   <!-- 재고 소진 -->
+            {% elif cake.display == 3 %}
+              ⚫️ {{ cake.get_display_display }}   <!-- 시즌 종료 -->
+            {% endif %}
+          </td>
+          <td class="">
+            <div class="table__table__functions">
+              <button class="lg-reg" onclick="location.href='{% url 'cookies_view' cake.id %}'">👀</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cakes_add_and_edit' cake.id %}'">✍🏽</button>
+              <button class="lg-reg" onclick="location.href='{% url 'cookies_delete' cake.id %}'">🗑️</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <!-- 하단 -->
+    <div class="align center">
+      <ul class="table__paging">
+      {% if cakes.has_previous %}
+        <li class="align center"><button class="lg-bold" onclick="location.href='?page=1'" title="처음으로">👈🏽</button></li>
+      {% endif %}
+
+      {% for page_num in cakes.paginator.page_range %}
+        {% if page_num >= cakes.number|add:-4 and page_num <= cakes.number|add:4 %}
+        {% if page_num == cakes.number %}
+        <li><button class="align center md-reg table__paging__btn active" onclick="location.href='?page={{ page_num }}'">{{ page_num }}</button></li>
+        {% else %}
+        <li><button class="align center md-reg table__paging__btn" onclick="location.href='?page={{ page_num }}'">{{ page_num }}</button></li>
+        {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      {% if cakes.has_next %}
+        <li class="align center"><button class="lg-bold" onclick="location.href='?page={{ cakes.paginator.num_pages }}'" title="마지막으로">👉🏽</button></li>
+      {% endif %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

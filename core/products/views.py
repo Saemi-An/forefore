@@ -1,10 +1,12 @@
+from collections import defaultdict
+
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Sales, Products, Times, Cookies, Options, Schedules, Cakes, CakeOptions, CakeSchedules
-from .forms import ProductAdd, TimeAdd, CookieAdd, OptionAdd, ScheduleAdd, TestForm
-from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer, get_paginated_objects, match_type_from_str_to_int
+from .forms import ProductAdd, TimeAdd, CookieAdd, OptionAdd, ScheduleAdd, CakeAdd, TestForm
+from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer, get_paginated_objects, match_type_from_str_to_int, get_cakes_sales
 
 # 추후 삭제
 from .models import BitDays
@@ -281,15 +283,74 @@ def cookies_times_delete(request, pk):
 # *************************** 홀케이크 ***************************
 # ==============================================================
 
-def cakes(reqeust):
-    return
+def cakes(request):
+    cakes = Cakes.objects.all().order_by('index')
+    page_obj = get_paginated_objects(request, cakes)
+    cakes_sales = get_cakes_sales()
+    
+    context = {
+        'cakes': page_obj,
+        'sales': cakes_sales,
+    }
+
+    return render(request, 'products/cakes.html', context)
+
+
+
+
+
+def cakes_add_and_edit(request, pk=None):
+    cake = get_object_or_404(Cakes, id=pk) if pk else None
+    main_options = Options.objects.filter(type=1).order_by('price', 'name')
+    sub_options = defaultdict(list)
+    for option in Options.objects.exclude(type=1).order_by('type', 'name'):
+        sub_options[option.type].append(option)
+
+    if request.method == 'POST':
+        print('포스트 요청옴')
+        form = CakeAdd(request.POST, request.FILES, instance=cake)
+        redirect_url = request.POST.get('redirect_url', '/manager/cakes/')
+
+        if form.is_valid():
+            print('폼이 벨리드함')
+            print(form.data)
+            # form.save()
+            messages.success(request, '성공적으로 저장 되었습니다.')
+            # return redirect(redirect_url)
+            return redirect('cakes')
+        else:
+            print('폼이 벨리드 하지 않음')
+            print(form.data)
+            print(form.errors)
+    else:
+        print('겟 요청옴')
+        form = CakeAdd(instance=cake)
+        referer = get_referer(request, 'cakes')
+
+    context = {
+        'form': form,
+        'cake': cake,
+        'main_options': main_options,
+        'sub_options': dict(sub_options),
+        'referer': referer if request.method == 'GET' else None
+    }
+    return render(request, 'products/cakes_add.html', context)
+
+
+
+
+
+
+
+
+
 
 def cakes_options(request, str_type='all'):
     int_type = match_type_from_str_to_int(str_type)
     if int_type:
-        options = Options.objects.filter(type=int_type).order_by('type', 'name', 'price')
+        options = Options.objects.filter(type=int_type).order_by('type', 'price', 'name')
     else:
-        options = Options.objects.all().order_by('type', 'name', 'price')
+        options = Options.objects.all().order_by('type', 'price', 'name')
     page_obj = get_paginated_objects(request, options)
     
     context = {'options': page_obj, 'selected_type': str_type}

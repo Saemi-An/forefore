@@ -221,6 +221,81 @@ class CookieAdd(forms.ModelForm):
 # ==============================================================
 # *************************** 홀케이크 ***************************
 # ==============================================================
+class CakeAdd(forms.ModelForm):
+
+    class Meta:
+        model = Cakes
+        exclude = ('index', )
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'md-reg',
+                'placeholder': '입력해 주세요.'
+            }),
+            'cmt': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'md-reg',
+                'placeholder': '입력해 주세요.'
+            }),
+            'img': forms.ClearableFileInput(attrs={
+                'id': 'fileUpload',
+                'class': 'display-none'
+            }),
+            'display': forms.Select(attrs={
+                'class': 'md-reg add_md-reg_class_to_options'
+            }),
+            # 'options': forms.CheckboxSelectMultiple(
+            #     # attrs={'class': 'hideDjangoInput'},
+            #     choices=Options.objects.all().order_by('type', 'price', 'name')
+            # ),
+            'schedules': forms.CheckboxSelectMultiple(
+                attrs={'class': 'visually-hidden'},
+                choices=Schedules.objects.all().order_by('name', 'start_date', 'start_time')
+            )
+        }       
+
+    # 커스텀
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].required = False
+        self.fields['cmt'].required = False
+        self.fields['img'].required = False        
+        self.fields['display'].required = False
+        self.fields['options'].required = False
+        self.fields['schedules'].required = False
+
+        # display 드롭다운 기본값 커스텀
+        display_choices = self.fields['display'].choices
+        if display_choices and display_choices[0][0] == '':
+            self.fields['display'].choices = [('', '선택해 주세요.')] + list(display_choices[1:])
+
+    # 유효성 검사
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        cmt = cleaned_data.get('cmt')
+        img = cleaned_data.get('img')
+        display = cleaned_data.get('display')
+        options = cleaned_data.get('options')
+        schedules = cleaned_data.get('schedules')
+
+        if not name:
+            self.add_error('name', '필수 입력값 입니다.')
+
+        if len(cmt) > 30:
+            self.add_error('cmt', '공백포함 최대 30자까지 입력이 가능합니다.')
+
+        if img is None or (isinstance(img, str) and img == ''):
+            self.add_error('img', '필수 입력값 입니다.')
+
+        if not display:
+            self.add_error('display', '필수 입력값 입니다.')
+
+        if not options:
+            self.add_error('options', '필수 입력값 입니다.')
+
+        if not schedules:
+            self.add_error('schedules', '필수 입력값 입니다.')
+
 class OptionAdd(forms.ModelForm):
 
     class Meta:
@@ -256,7 +331,7 @@ class OptionAdd(forms.ModelForm):
     # 유효성 검사
     def clean(self):
         cleaned_data = super().clean()
-        type = cleaned_data.get('type')
+        type = cleaned_data.get('type') 
         name = cleaned_data.get('name')
         price = cleaned_data.get('price')
 

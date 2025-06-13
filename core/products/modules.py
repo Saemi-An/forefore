@@ -59,6 +59,10 @@ def change_cookie_index(idx, target_idx):
 # ==============================================================
 # *************************** 홀케이크 ***************************
 # ==============================================================
+def get_cakes_sales():
+    # sale, created = Sales.objects.get_or_create(id=1)  # 테스트 필요
+    cakes_sales = get_object_or_404(Sales, pk=2).on_sale
+    return cakes_sales
 
 def match_type_from_str_to_int(str_type):
     if str_type == 'size':

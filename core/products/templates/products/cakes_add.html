@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load customtags %}
+
+{% block script %}
+<script src="{% static 'js/products/cakes_add.js' %}" defer></script>
+<style>
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+</style>
+{% endblock %}
+
+{% block main %}
+<form method="POST" action="{% if cake %}{% url 'cakes_add_and_edit' cake.pk %}{% else %}{% url 'cakes_add_and_edit' 0 %}{% endif %}" class="column_24" enctype="multipart/form-data" id="cakeForm">
+  {% csrf_token %}
+  <section class="paper">
+    <p class="lg-bold">구움과자 상품 {% if cake %}수정{% else %}등록{% endif %}</p>
+    
+    <section class="form">
+      <p class="lg-bold form__title">상품 정보</p>
+      <div class="form__group">
+
+        <div class="form__group__elem">
+          <div class="gorm__group__elem__sub-title">
+            <span class="md-bold">상품명</span>
+            <span class="md-bold txt-color-orange">*</span>
+          </div>
+          {{ form.name }}
+          {% if form.name.errors %}<span class="sm-reg txt-color-orange mgl4">{{ form.name.errors }}</span>{% endif %}
+        </div>
+
+        <div class="form__group__elem">
+          <span class="md-bold">상품 설명</span>
+          {{ form.cmt }}
+          {% if form.cmt.errors %}<span class="sm-reg txt-color-orange mgl4">{{ form.cmt.errors }}</span>{% endif %}
+        </div>
+
+        <div class="form__group__elem">
+          <span class="md-bold">상품 이미지</span>
+          <span class="sm-reg txt-color-gray09">정사각형 비율의 최대 2MB의 이미지 파일(jpg, jpeg, png)을 업로드 해주세요.</span>
+          <div class="form__group__elem__upload" id="uploadDiv">
+            <label for="fileUpload" class="md-reg">파일 선택</label>
+            <span class="md-reg txt-color-gray09" id="customSpan">{% if cake %}{{ cake.img | drop_upload_to_cake }}{% else %}선택된 파일 없음{% endif %}</span>
+            {{ form.img }}
+          </div>
+          {% if form.img.errors %}<span class="sm-reg txt-color-orange mgl4">{{ form.img.errors }}</span>{% endif %}
+          <div class="form__group__elem__preview{% if not cake %} display-none{% endif %}" id="imgPreviewDiv">
+            <img src="{% if cake %}/admin_media/{{ cake.img }}{% endif %}" alt="">
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="form">
+      <p class="lg-bold form__title">필수 옵션</p>
+      <div class="form__group">
+        <div class="form__group__elem">
+          <div class="gorm__group__elem__sub-title">
+            <span class="md-bold">호수</span>
+            <span class="md-bold txt-color-orange">*</span>
+          </div>
+          <div>
+          {% for opt in main_options %}
+            <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
+              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <span class="md-reg">{{ opt.name }}</span>
+            </button>
+          {% endfor %}
+          </div>
+          {% if form.options.errors %}<span class="sm-reg txt-color-orange mgl4">{{ form.options.errors }}</span>{% endif %}
+        </div>
+
+      </div>
+    </section>
+
+    <section class="form">
+      <p class="lg-bold form__title">선택 옵션</p>
+      <div class="form__group">
+        {% for int_type, options in sub_options.items %}
+        
+        {% if int_type == 2 %}
+        <div class="form__group__elem">
+          <span class="md-bold">과일 추가</span>
+          <div>
+          {% for opt in options %}
+            <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
+              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <span class="md-reg">{{ opt.name }}</span>
+            </button>
+          {% endfor %}
+          </div>
+        </div>
+        {% elif int_type == 3 %}
+        <div class="form__group__elem">
+          <span class="md-bold">과일 믹스</span>
+          <div>
+          {% for opt in options %}
+            <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
+              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <span class="md-reg">{{ opt.name }}</span>
+            </button>
+          {% endfor %}
+          </div>
+        </div>
+        {% elif int_type == 4 %}
+        <div class="form__group__elem">
+          <span class="md-bold">생크림 변경</span>
+          <div>
+          {% for opt in options %}
+            <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
+              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <span class="md-reg">{{ opt.name }}</span>
+            </button>
+          {% endfor %}
+          </div>
+        </div>
+        {% elif int_type == 5 %}
+        <div class="form__group__elem">
+          <span class="md-bold">시트 변경</span>
+          <div>
+          {% for opt in options %}
+            <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
+              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <span class="md-reg">{{ opt.name }}</span>
+            </button>
+          {% endfor %}
+          </div>
+        </div>
+        {% elif int_type == 6 %}
+        <div class="form__group__elem">
+          <span class="md-bold">초코 글라사주</span>
+          <div>
+          {% for opt in options %}
+            <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
+              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <span class="md-reg">{{ opt.name }}</span>
+            </button>
+          {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="form">
+      <p class="lg-bold form__title">픽업</p>
+      <div class="form__group">
+
+        <div class="form__group__elem">
+          <span class="md-bold">픽업 날짜 및 시간</span>
+          
+          {% for label in form.schedules %}
+          {% comment %} {% if label.data.value in form.schedules.value %}이게뭐야{% endif %} {% endcomment %}
+          <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
+            <div class="btn-check_off"></div>
+            {{ label.tag }}
+            <span class="md-reg">{{ label.choice_label }}</span>
+          </button>
+          {% endfor %}
+
+          {% if form.schedules.errors %}<span class="sm-reg txt-color-orange mgl4">{{ form.schedules.errors }}</span>{% endif %}
+        </div>
+
+      </div>
+    </section>
+
+    <section class="form">
+      <p class="lg-bold form__title">상품 노출 설정</p>
+      <div class="form__group">
+
+        <div class="form__group__elem">
+          <span class="md-bold">디스플레이</span>
+          {{ form.display }}
+          {% if form.display.errors %}<span class="sm-reg txt-color-orange mgl4">{{ form.display.errors }}</span>{% endif %}
+        </div>
+
+      </div>
+    </section>
+
+  </section>
+
+  <section class="align both">
+    <button type="button" class="md-reg btn-normal txt-color-green" onclick="goBack()">뒤로가기</button>
+    <div class="view-btn">
+      <button type="submit" class="emoji-btn green" onclick="submitCakeForm(event)">
+        <div class="div_with_emoji">
+          <span class="md-reg emoji_mgb04">👍🏽</span>
+          <span type="submit" class="md-reg txt-color-white">저장하기</span>
+          <input type="hidden" name="redirect_url" value="{{ referer }}">
+        </div>
+      </button>
+    </div>
+  </section>
+</form>
+{% endblock %}

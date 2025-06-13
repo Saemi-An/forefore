@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import Sales
 from .models import Products, Times, Cookies
-from .models import Options, Schedules, Cakes
+from .models import Options, Schedules, Cakes, CakeOptions, CakeSchedules
 from .forms import SchedulesForm
 
 from .models import BitDays
@@ -21,6 +21,8 @@ class SchedulesAdmin(admin.ModelAdmin):
     form = SchedulesForm
     list_display = ('id', 'name', 'start_date', 'end_date', 'get_days_display', 'days', 'start_time', 'end_time', 'interval')
 admin.site.register(Cakes)
+admin.site.register(CakeOptions)
+admin.site.register(CakeSchedules)
 
 @admin.register(BitDays)
 class BitDaysAdmin(admin.ModelAdmin):

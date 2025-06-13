@@ -13,6 +13,11 @@ def intcomma(value):
 def drop_upload_to(value):  # cookies/0_고구마휘낭시에.jpg
     return str(value).split('cookies/')[1]
 
+# DB에 이미지명 앞에 cakes/ 떼어주기
+@register.filter
+def drop_upload_to_cake(value):  # cakes/2_딸기우유생크림케이크.jpg
+    return str(value).split('cakes/')[1]
+
 # 비트마스킹 표현
 @register.filter
 def get_days_from_bitmask(bitmask: int) -> str:

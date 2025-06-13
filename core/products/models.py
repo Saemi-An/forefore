@@ -161,7 +161,7 @@ class Options(models.Model):
     price = models.PositiveIntegerField()
 
     def __str__(self):
-        return f'{self.name}, {self.price}원'
+        return f'{self.name}, {self.price}원 / pk: {self.pk}'
 
 
 class Schedules(models.Model):

@@ -16,7 +16,7 @@ function submitScheduleForm(event) {
     // 선택된 요일들 비트마스킹 값으로 변환하여 hiddenDaysInput에 value 주기
     const hiddenDaysInput = document.getElementById('hiddenDaysInput');
     let bitmask = 0;
-    const checkedBoxes = document.querySelectorAll('.btn-check_on')
+    const checkedBoxes = document.querySelectorAll('.btn-check_on');
     if (checkedBoxes.length > 0) {
         checkedBoxes.forEach(box => {
             bitmask |= (1 << parseInt(box.dataset['selected']))

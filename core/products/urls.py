@@ -30,6 +30,9 @@ urlpatterns = [
     path('cookies-times/delete/<int:pk>/', login_required(views.cookies_times_delete), name='cookies_times_delete'),
 
     # 홀케이크
+    path('cakes/', login_required(views.cakes), name='cakes'),
+    path('cakes/add/<int:pk>', login_required(views.cakes_add_and_edit), name='cakes_add_and_edit'),
+    
     path('cakes-options/add/<int:pk>', login_required(views.cakes_options_add_and_edit), name='cakes_options_add'),
     path('cakes-options/view/<int:pk>/', login_required(views.cakes_options_view), name='cakes_options_view'),
     path('cakes-options/delete/<int:pk>/', login_required(views.cakes_options_delete), name='cakes_options_delete'),
