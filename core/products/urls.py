@@ -31,6 +31,7 @@ urlpatterns = [
 
     # 홀케이크
     path('cakes/', login_required(views.cakes), name='cakes'),
+    path('cakes/change-sales-status/', login_required(views.change_cakes_sales), name='change_cakes_sales'),
     path('cakes/view/<int:pk>/', login_required(views.cakes_view), name='cakes_view'),
     path('cakes/add/<int:pk>', login_required(views.cakes_add_and_edit), name='cakes_add_and_edit'),
     path('cakes/delete/<int:pk>/', login_required(views.cakes_delete), name='cakes_delete'),
@@ -45,7 +46,5 @@ urlpatterns = [
     path('cakes-schedules/add/<int:pk>', login_required(views.cakes_schedules_add_and_edit), name='cakes_schedules_add'),
     path('cakes-schedules/delete/<int:pk>/', login_required(views.cakes_schedules_delete), name='cakes_schedules_delete'),
 
-
     path('test/', login_required(views.test), name='test'),
-    path('test2/', login_required(views.test2), name='test2'),
 ]

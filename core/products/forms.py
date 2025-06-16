@@ -281,8 +281,8 @@ class CakeAdd(forms.ModelForm):
         if not name:
             self.add_error('name', '필수 입력값 입니다.')
 
-        if len(cmt) > 30:
-            self.add_error('cmt', '공백포함 최대 30자까지 입력이 가능합니다.')
+        if len(cmt) > 50:
+            self.add_error('cmt', '공백포함 최대 50자까지 입력이 가능합니다.')
 
         if img is None or (isinstance(img, str) and img == ''):
             self.add_error('img', '필수 입력값 입니다.')
@@ -339,7 +339,7 @@ class OptionAdd(forms.ModelForm):
             self.add_error('type', '필수 입력값 입니다.')
         if not name:
             self.add_error('name', '필수 입력값 입니다.')
-        if not price:
+        if price == '':
             self.add_error('price', '필수 입력값 입니다.')
 
 

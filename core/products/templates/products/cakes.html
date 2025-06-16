@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load customtags %}
 
+{% block script %}
+<script src="{% static 'js/products/cakes.js' %}" defer></script>
+{% endblock %}
 
 {% block modal %}
 <!-- 일반 모달 -->
@@ -10,34 +14,32 @@
     <p class="lg-bold">🌙 예약 판매 마감 🌙</p>
     <div class="modal__cnt__txt">
       <div>
-        <p class="md-reg">관리자 페이지에서</p>
-        <p class="md-reg"><span class="md-bold txt-color-blue">선택된 픽업시간이 초기화 됩니다.</span></p>
+        <p class="md-reg">현재 예약 가능한 모든 상품이</p>
+        <p class="md-reg"><span class="md-bold txt-color-blue">'상품 노출 [예약 마감]'</span></p>
+        <p class="md-reg">상태로 변경 됩니다.</p>
       </div>
       <div>
-        <p class="md-reg">사용자 페이지에서</p>
-        <p class="md-reg"><span class="md-bold txt-color-blue">픽업 시간 선택란이 초기화 됩니다.</span></p>
-      </div>
-      <div>
-        <p class="md-reg">오늘의 구움과자 판매를</p>
-        <p class="md-reg">종료 하시겠습니까?</p>
+        <p class="md-bold txt-color-blue">홀케이크 예약 판매를 종료</p>
+        <p class="md-reg">하시겠습니까?</p>
       </div>
     </div>
     {% else %}
     <p class="lg-bold">✨ 예약 판매 시작 ✨</p>
     <div class="modal__cnt__txt">
       <div>
-        <p class="md-reg">판매 중에는</p>
-        <p class="md-reg"><span class="md-bold txt-color-orange">픽업시간 변경이 불가능</span> 합니다.</p>
+        <p class="md-reg">예약 마감 상태의 모든 상품이</p>
+        <p class="md-reg"><span class="md-bold txt-color-orange">'상품 노출'</span></p>
+        <p class="md-reg">상태로 변경 됩니다.</p>
       </div>
       <div>
-        <p class="md-reg">오늘의 구움과자 판매를</p>
-        <p class="md-reg">시작 하시겠습니까?</p>
+        <p class="md-bold txt-color-orange">홀케이크 예약 판매를 시작</p>
+        <p class="md-reg">하시겠습니까?</p>
       </div>
     </div>
     {% endif %}
     <div class="modal__cnt__btn">
       <button type="button" class="md-reg btn-normal txt-color-green" onclick="closeNormalModal()">취소</button>
-      <button class="md-reg btn-green txt-color-white" onclick="location.href='{% url 'change_cookies_sale' %}'">확인</button>
+      <button class="md-reg btn-green txt-color-white" onclick="location.href='{% url 'change_cakes_sales' %}'">확인</button>
     </div>
   </div>
 </div>
@@ -99,8 +101,8 @@
           <th class="md-bold">순서 변경</th>
           <th class="md-bold">이미지</th>
           <th class="md-bold">상품명</th>
+          <th class="md-bold">상품 설명</th>
           <th class="md-bold">노출 상태</th>
-          <th class="md-bold">픽업 시간</th>
           <th class="md-bold">기능</th>
         </tr>
       </thead>
@@ -118,7 +120,7 @@
             <img src="/admin_media/{{ cake.img }}" alt="" class="table__table__img">
           </td>
           <td class="md-reg">{{ cake.name }}</td>
-          <td class="md-reg">여기 스케쥴'들' 들어갈 곳</td>
+          <td class="md-reg">{% if cake.cmt %}{{ cake.cmt }}{% else %}-{% endif %}</td>
           <td class="md-reg">
             {% if cake.display == 0 %}
               ⚪️ {{ cake.get_display_display }}   <!-- 판매 대기중 -->

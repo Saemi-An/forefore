@@ -69,24 +69,7 @@ class Cookies(models.Model):
             total = Cookies.objects.filter(product__category=category_num).count()
             self.index = (100 * category_num) + 1 + total
 
-            # if self.product.category == 1:
-            #     total = Cookies.objects.filter(product__category=1).count()
-            #     self.index = 101 + total
-
-            # elif self.product.category == 2:
-            #     total = Cookies.objects.filter(product__category=2).count()
-            #     self.index = 201 + total
-
-            # elif self.product.category == 3:
-            #     total = Cookies.objects.filter(product__category=3).count()
-            #     self.index = 301 + total
-
-            # else:
-            #     total = Cookies.objects.filter(product__category=4).count()
-            #     self.index = 401 + total
-            
-
-        # [시즌 종료] 상태라면, current_stock은 null ------------------------------------------------
+        # [시즌 종료] 상태라면, current_stock은 0 ------------------------------------------------
         if self.status == 3:
             self.total = 0
             self.safe = 0
@@ -244,8 +227,8 @@ class CakeOptions(models.Model):
     class Meta:
         db_table = 'CakeOptions'
     
-    cake = models.ForeignKey(Cakes, on_delete=models.PROTECT)
-    option = models.ForeignKey(Options, on_delete=models.PROTECT)
+    cake = models.ForeignKey(Cakes, on_delete=models.CASCADE)
+    option = models.ForeignKey(Options, on_delete=models.CASCADE)
     # on_delete 동작 방식: FK 선언된 모델 기준. 즉, FK가 어떤 객체를 참조하고 있다면, 그 참조 대상이 삭제될 때의 동작을 지정함.
     # option = models.ForeignKey(Options, on_delete=models.CASCADE)
     # 위와 같이 설정되어 있다면, Options 모델에서 인스턴스가 삭제된다면, CakeOptions 모델에서 삭제된 인스턴스를 참조하는 모든 인스턴스들이 같이 삭제됨.

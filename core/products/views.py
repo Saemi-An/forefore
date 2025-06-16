@@ -8,10 +8,6 @@ from .models import Sales, Products, Times, Cookies, Options, Schedules, Cakes, 
 from .forms import ProductAdd, TimeAdd, CookieAdd, OptionAdd, ScheduleAdd, CakeAdd, TestForm
 from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer, get_paginated_objects, match_type_from_str_to_int, get_cakes_sales
 
-# 추후 삭제
-from .models import BitDays
-from .forms import BitDaysForm
-
 
 def cookies(request, category='all'):
     int_category = match_category_from_str_to_int(category)
@@ -156,8 +152,17 @@ def cookies_delete(request, pk):
     else:
         referer = get_referer(request, 'cookies')
     
+    # 인덱스 변경
     cookie = get_object_or_404(Cookies, id=pk)
+    target_idx = cookie.index
+    target_category = cookie.product.category
+    index_minus_one_cookies = Cookies.objects.filter(index__gt=target_idx, index__lt=(target_category + 1)*100).order_by('index')
+    
     cookie.delete()
+    for cookie in index_minus_one_cookies:
+        cookie.index = cookie.index - 1
+        cookie.save(update_fields=['index'])
+
     messages.success(request, '성공적으로 삭제 되었습니다.')
     return redirect(referer)
 
@@ -286,15 +291,33 @@ def cookies_times_delete(request, pk):
 def cakes(request):
     cakes = Cakes.objects.all().order_by('index')
     page_obj = get_paginated_objects(request, cakes)
-    cakes_sales = get_cakes_sales()
+    sales = get_cakes_sales()
     
     context = {
+        'sales': sales,
         'cakes': page_obj,
-        'sales': cakes_sales,
     }
 
     return render(request, 'products/cakes.html', context)
 
+def change_cakes_sales(request):
+    referer = get_referer(request, 'cakes')
+    
+    status = get_object_or_404(Sales, id=2)
+    #판매 종료: '상품 노출'--> '예약 마감'
+    if status.on_sale:
+        Cakes.objects.filter(display=1).update(display=2)
+    
+    # 판매 시작: '예약 마감' --> '상품 노출'
+    else:
+        Cakes.objects.filter(display=2).update(display=1)
+
+    status.on_sale = not status.on_sale
+    status.save()
+    toast_msg = '시작' if status.on_sale else '종료'
+    messages.success(request, f'홀케이크 예약 판매가 {toast_msg} 되었습니다.')
+
+    return redirect(referer)
 
 # options, schedules 필드
 # 추후 options 필드도 진짜 폼 사용하도록 변경 필요
@@ -376,8 +399,16 @@ def cakes_delete(request, pk):
     else:
         referer = get_referer(request, 'cookies-products')
 
+    # 인덱스 변경
     cake = get_object_or_404(Cakes, id=pk)
-    # cake.delete()
+    target_idx = cake.index
+    index_minus_one_cakes = Cakes.objects.filter(index__gt=target_idx)
+
+    cake.delete()
+    for cake in index_minus_one_cakes:
+        cake.index = cake.index - 1
+        cake.save(update_fields=['index'])
+
     messages.success(request, '성공적으로 삭제 되었습니다.')
 
     return redirect(referer if request.method == 'GET' else redirect_url)
@@ -421,7 +452,7 @@ def cakes_options_add_and_edit(request, pk=None):
             return redirect(redirect_url)
     else:
         form = OptionAdd(instance=option)
-        referer = get_referer(request, 'cookies-times')
+        referer = get_referer(request, 'cakes-options')
     
     context = {
         'form': form,
@@ -436,7 +467,7 @@ def cakes_options_delete(request, pk):
     if request.method == 'POST':
         referer = request.POST.get('redirect_url', '/manager/cakes-options/all/')
     else:
-        referer = get_referer(request, 'cookies-products')
+        referer = get_referer(request, 'cakes-options')
 
     option = get_object_or_404(Options, id=pk)
     try:
@@ -461,7 +492,7 @@ def cakes_schedules(request):
 def cakes_schedules_view(request, pk):
     schedule = get_object_or_404(Schedules, id=pk)
     is_being_used = CakeSchedules.objects.filter(schedule=schedule).exists()
-    referer = get_referer(request, 'cookies-products')
+    referer = get_referer(request, 'cakes-schedules')
     context = {'schedule': schedule, 'referer': referer, 'is_being_used': is_being_used}
 
     return render(request, 'products/cakes_schedules_view.html', context)
@@ -483,7 +514,7 @@ def cakes_schedules_add_and_edit(request, pk=None):
         
     else:
         form = ScheduleAdd(instance=schedule)
-        referer = get_referer(request, 'cookies-times')
+        referer = get_referer(request, 'cake-schedules')
     
     context = {
         'form': form,
@@ -515,60 +546,7 @@ def cakes_schedules_delete(request, pk):
 
 # 테스트용: 추후 삭제 필요
 def test(request):
-    # request.POST.getlist('days')
-    if request.method == 'POST':
-        form = BitDaysForm(request.POST)
-        if form.is_valid():
-            schedule_obj = form.save(commit=False)
-
-            str_days = request.POST.get('selected_days').strip()
-            lst_days = list(map(int, str_days.split())) # ['1', '2', '10'] --> [1, 2, 10]
-            bitmask = 0
-            for elem in lst_days:
-                bitmask |= 1 << elem
-            
-            schedule_obj.days = bitmask
-            form.save()
-            return redirect('test')
-    else:
-        form = BitDaysForm()
-        test_form = TestForm()
-        objs = BitDays.objects.all().order_by('pk')
-
     context = {
-        'objs': objs,
-        'form': form,
-        'test_form': test_form,
+
     }
-
     return render(request, 'products/test.html', context)
-
-def test2(request):
-    if request.method == 'POST':
-        test_form = TestForm(request.POST)
-        if test_form.is_valid():
-            print('폼이 벨리드함')
-            print(test_form.data)
-
-            days = test_form.cleaned_data['days']
-            print(days)
-
-
-        else:
-            print('폼이 벨리드 하지 못함')
-            print(test_form.errors)
-            print(test_form.data)
-    else:
-        test_form = TestForm()
-    
-    form = BitDaysForm()
-    objs = BitDays.objects.all().order_by('pk')
-
-    context = {
-        'objs': objs,
-        'form': form,
-        'test_form': test_form,
-    }
-
-    return render(request, 'products/test.html', context)
-    
