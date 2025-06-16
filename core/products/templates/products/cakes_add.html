@@ -4,19 +4,6 @@
 
 {% block script %}
 <script src="{% static 'js/products/cakes_add.js' %}" defer></script>
-<style>
-.visually-hidden {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-}
-</style>
 {% endblock %}
 
 {% block main %}
@@ -45,7 +32,10 @@
         </div>
 
         <div class="form__group__elem">
-          <span class="md-bold">상품 이미지</span>
+          <div class="gorm__group__elem__sub-title">
+            <span class="md-bold">상품 이미지</span>
+            <span class="md-bold txt-color-orange">*</span>
+          </div>
           <span class="sm-reg txt-color-gray09">정사각형 비율의 최대 2MB의 이미지 파일(jpg, jpeg, png)을 업로드 해주세요.</span>
           <div class="form__group__elem__upload" id="uploadDiv">
             <label for="fileUpload" class="md-reg">파일 선택</label>
@@ -72,8 +62,8 @@
           <div>
           {% for opt in main_options %}
             <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
-              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
-              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <div class="btn-check_{% if opt.pk in test %}on{% else %}off{% endif %}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" {% if opt.pk in test %}checked{% endif %} class="visually-hidden">
               <span class="md-reg">{{ opt.name }}</span>
             </button>
           {% endfor %}
@@ -95,8 +85,8 @@
           <div>
           {% for opt in options %}
             <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
-              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
-              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <div class="btn-check_{% if opt.pk in test %}on{% else %}off{% endif %}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" {% if opt.pk in test %}checked{% endif %} class="visually-hidden">
               <span class="md-reg">{{ opt.name }}</span>
             </button>
           {% endfor %}
@@ -108,8 +98,8 @@
           <div>
           {% for opt in options %}
             <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
-              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
-              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <div class="btn-check_{% if opt.pk in test %}on{% else %}off{% endif %}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" {% if opt.pk in test %}checked{% endif %} class="visually-hidden">
               <span class="md-reg">{{ opt.name }}</span>
             </button>
           {% endfor %}
@@ -121,8 +111,8 @@
           <div>
           {% for opt in options %}
             <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
-              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
-              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <div class="btn-check_{% if opt.pk in test %}on{% else %}off{% endif %}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" {% if opt.pk in test %}checked{% endif %} class="visually-hidden">
               <span class="md-reg">{{ opt.name }}</span>
             </button>
           {% endfor %}
@@ -134,8 +124,8 @@
           <div>
           {% for opt in options %}
             <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
-              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
-              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <div class="btn-check_{% if opt.pk in test %}on{% else %}off{% endif %}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" {% if opt.pk in test %}checked{% endif %} class="visually-hidden">
               <span class="md-reg">{{ opt.name }}</span>
             </button>
           {% endfor %}
@@ -147,8 +137,8 @@
           <div>
           {% for opt in options %}
             <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
-              <div class="btn-check_off" data-selected-opt="{{ opt.pk }}"></div>
-              <input type="checkbox" name="options" value="{{ opt.pk }}" class="visually-hidden">
+              <div class="btn-check_{% if opt.pk in test %}on{% else %}off{% endif %}"></div>
+              <input type="checkbox" name="options" value="{{ opt.pk }}" {% if opt.pk in test %}checked{% endif %} class="visually-hidden">
               <span class="md-reg">{{ opt.name }}</span>
             </button>
           {% endfor %}
@@ -165,12 +155,13 @@
       <div class="form__group">
 
         <div class="form__group__elem">
-          <span class="md-bold">픽업 날짜 및 시간</span>
-          
+          <div class="gorm__group__elem__sub-title">
+            <span class="md-bold">픽업 날짜 및 시간</span>
+            <span class="md-bold txt-color-orange">*</span>
+          </div>          
           {% for label in form.schedules %}
-          {% comment %} {% if label.data.value in form.schedules.value %}이게뭐야{% endif %} {% endcomment %}
           <button type="button" class="modal__pickup__body__cnt__checkbox" onclick="customCheckBox(this)">
-            <div class="btn-check_off"></div>
+            <div class="btn-check_{% if opt.pk in form.data.schedules %}on{% else %}off{% endif %}"></div>
             {{ label.tag }}
             <span class="md-reg">{{ label.choice_label }}</span>
           </button>
@@ -185,13 +176,14 @@
     <section class="form">
       <p class="lg-bold form__title">상품 노출 설정</p>
       <div class="form__group">
-
         <div class="form__group__elem">
-          <span class="md-bold">디스플레이</span>
+          <div class="gorm__group__elem__sub-title">
+            <span class="md-bold">디스플레이</span>
+            <span class="md-bold txt-color-orange">*</span>
+          </div>      
           {{ form.display }}
           {% if form.display.errors %}<span class="sm-reg txt-color-orange mgl4">{{ form.display.errors }}</span>{% endif %}
         </div>
-
       </div>
     </section>
 

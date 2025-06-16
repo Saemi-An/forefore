@@ -70,17 +70,17 @@
         </ul>
       </div>
       <div class="nav__section">
-        <div class="nav__section__title align both" onclick="location.href='{% url 'test' %}'">
+        <div class="nav__section__title align both {% if '/cakes' in request.path %}active{% endif %}" onclick="showCakeSection()" id="cakeDiv">
           <div class="div_with_emoji">
             <span class="lg-bold emoji_mgb02">🎂</span>
             <span class="md-bold">홀케이크</span>
           </div>
-          <span class="lg-bold">📘</span>
+          <span class="lg-bold" id="cakeDivIcon">{% if '/cakes' in request.path %}📖{% else %}📘{% endif %}</span>
         </div>
-        <ul class="nav__section__title__sub">
-          <li class="nav__section__title__sub-title md-reg">홀케이크 판매</li>
-          <li class="nav__section__title__sub-title md-reg">홀케이크 옵션</li>
-          <li class="nav__section__title__sub-title md-reg">홀케이크 픽업시간</li>
+        <ul class="nav__section__title__sub {% if '/cakes' not in request.path %}display-none{% endif %}" id="cakeSubMenu">
+          <li class="nav__section__title__sub-title md-reg {% if '/cakes/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cakes' %}'">홀케이크 판매</li>
+          <li class="nav__section__title__sub-title md-reg {% if '/cakes-options/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cakes_options' 'all' %}'">홀케이크 옵션</li>
+          <li class="nav__section__title__sub-title md-reg {% if '/cakes-schedules/' in request.path %}active{% endif %}" onclick="location.href='{% url 'cakes_schedules' %}'">홀케이크 픽업시간</li>
         </ul>
       </div>
       <div class="nav__section">

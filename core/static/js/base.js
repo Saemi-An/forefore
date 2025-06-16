@@ -16,12 +16,33 @@ document.getElementById('hamburgerIcon').addEventListener('click', () => {
 // ===================================== nav 컨트롤 =====================================
 function showCookieSection() {
     const cookieDiv = document.getElementById('cookieDiv');
-    cookieDiv.classList.add('active');
-    const cookieDivIcon = document.getElementById('cookieDivIcon');
-    cookieDivIcon.innerText = '📖';
     const cookieSubMenu = document.getElementById('cookieSubMenu');
-    cookieSubMenu.style.display = 'block';
-
+    const cookieDivIcon = document.getElementById('cookieDivIcon');
+    
+    if (cookieSubMenu.classList.contains('display-none')) {   // 펼치기
+        cookieDiv.classList.add('active');
+        cookieSubMenu.classList.remove('display-none');
+        cookieDivIcon.innerText = '📖';
+    } else {   // 접기
+        cookieDiv.classList.remove('active');
+        cookieSubMenu.classList.add('display-none');
+        cookieDivIcon.innerText = '📘';
+    }
+}
+function showCakeSection() {
+    const cakeDiv = document.getElementById('cakeDiv');
+    const cakeSubMenu = document.getElementById('cakeSubMenu');
+    const cakeDivIcon = document.getElementById('cakeDivIcon');
+    
+    if (cakeSubMenu.classList.contains('display-none')) {   // 펼치기
+        cakeDiv.classList.add('active');
+        cakeSubMenu.classList.remove('display-none');
+        cakeDivIcon.innerText = '📖';
+    } else {   // 접기
+        cakeDiv.classList.remove('active');
+        cakeSubMenu.classList.add('display-none');
+        cakeDivIcon.innerText = '📘';
+    }
 }
 // ===================================== 공통 =====================================
 // 뒤로가기 버튼

@@ -221,8 +221,8 @@ class CookieAdd(forms.ModelForm):
 # ==============================================================
 # *************************** 홀케이크 ***************************
 # ==============================================================
-class CakeAdd(forms.ModelForm):
 
+class CakeAdd(forms.ModelForm):
     class Meta:
         model = Cakes
         exclude = ('index', )
@@ -244,7 +244,7 @@ class CakeAdd(forms.ModelForm):
                 'class': 'md-reg add_md-reg_class_to_options'
             }),
             # 'options': forms.CheckboxSelectMultiple(
-            #     # attrs={'class': 'hideDjangoInput'},
+            #     attrs={'class': 'visually-hidden'},
             #     choices=Options.objects.all().order_by('type', 'price', 'name')
             # ),
             'schedules': forms.CheckboxSelectMultiple(
@@ -287,7 +287,7 @@ class CakeAdd(forms.ModelForm):
         if img is None or (isinstance(img, str) and img == ''):
             self.add_error('img', '필수 입력값 입니다.')
 
-        if not display:
+        if display == "":
             self.add_error('display', '필수 입력값 입니다.')
 
         if not options:

@@ -296,30 +296,39 @@ def cakes(request):
     return render(request, 'products/cakes.html', context)
 
 
-
-
-
+# options, schedules 필드
+# 추후 options 필드도 진짜 폼 사용하도록 변경 필요
+    # 폼
+        # 가짜 폼 사용중 - 뷰에서 옵션 직접 넘겨주고, input 태그의 type과 name만 맞춰서 사용중
+        # 진짜 폼 수동 렌더링
+    # 커스텀 체크박스
+        # 뷰에서 selected_options 넘겨줌
+        # JS로 html 렌더링시 checked 속성을 갖는 input 찾아서 바꿔줌
 def cakes_add_and_edit(request, pk=None):
     cake = get_object_or_404(Cakes, id=pk) if pk else None
     main_options = Options.objects.filter(type=1).order_by('price', 'name')
     sub_options = defaultdict(list)
+    selected_options = list(map(int, Options.objects.filter(cakeoptions__cake_id=pk).values_list('id', flat=True)))
+        
     for option in Options.objects.exclude(type=1).order_by('type', 'name'):
         sub_options[option.type].append(option)
 
     if request.method == 'POST':
         print('포스트 요청옴')
         form = CakeAdd(request.POST, request.FILES, instance=cake)
-        redirect_url = request.POST.get('redirect_url', '/manager/cakes/')
 
+        redirect_url = request.POST.get('redirect_url', '/manager/cakes/')
         if form.is_valid():
             print('폼이 벨리드함')
             print(form.data)
-            # form.save()
+            form.save()
             messages.success(request, '성공적으로 저장 되었습니다.')
-            # return redirect(redirect_url)
-            return redirect('cakes')
+            return redirect(redirect_url)
+            # return redirect('cakes')
         else:
             print('폼이 벨리드 하지 않음')
+            # selected_options = list(map(int, form.data.getlist('options')))
+            print(f'폼으로 넘어온 옵션값: {selected_options}')
             print(form.data)
             print(form.errors)
     else:
@@ -332,14 +341,46 @@ def cakes_add_and_edit(request, pk=None):
         'cake': cake,
         'main_options': main_options,
         'sub_options': dict(sub_options),
-        'referer': referer if request.method == 'GET' else None
+        'referer': referer if request.method == 'GET' else redirect_url,
+        'test': selected_options,
     }
     return render(request, 'products/cakes_add.html', context)
 
 
+def cakes_view(request, pk):
+    cake = get_object_or_404(Cakes, id=pk)
+    referer = get_referer(request, 'cakes')
+    
+    raw_options = list(Options.objects.filter(cakeoptions__cake_id=pk).order_by('type', 'price', 'name').values('type', 'name', 'price'))
+    options_by_type = {}
+    for opt in raw_options:
+        key = str(opt['type'])
+        val = {'name': opt['name'], 'price': opt['price']}
+        options_by_type.setdefault(key, []).append(val)
+    
+    schedules = Schedules.objects.filter(cakeschedules__cake_id=pk).order_by('name', 'start_date', 'start_time')
+
+    context = {
+        'cake': cake,
+        'options': options_by_type,
+        'schedules': schedules,
+        'referer': referer
+    }
+
+    return render(request, 'products/cakes_view.html', context)
 
 
+def cakes_delete(request, pk):
+    if request.method == 'POST':
+        redirect_url = request.POST.get('redirect_url', '/manager/cakes/')
+    else:
+        referer = get_referer(request, 'cookies-products')
 
+    cake = get_object_or_404(Cakes, id=pk)
+    # cake.delete()
+    messages.success(request, '성공적으로 삭제 되었습니다.')
+
+    return redirect(referer if request.method == 'GET' else redirect_url)
 
 
 

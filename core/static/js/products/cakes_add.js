@@ -7,7 +7,7 @@ function submitCakeForm(event) {
     document.getElementById('cakeForm').submit();
 }
 
-// 커스텀 체크박스 컨트롤 + 히든 인풋 셀렉트
+// 클릭 이벤트: 커스텀 체크박스 컨트롤 + 히든 인풋 셀렉트
 function customCheckBox(btnDiv) {
     // 히든 인풋 컨트롤
     const hiddenInput = btnDiv.querySelector('input[type="checkbox"]');
@@ -18,10 +18,19 @@ function customCheckBox(btnDiv) {
         const fakeCheckbox = btnDiv.firstElementChild;
         fakeCheckbox.classList.remove('btn-check_on', 'btn-check_off');
         fakeCheckbox.classList.add(hiddenInput.checked ? 'btn-check_on' : 'btn-check_off');
+        
         // fakeCheckbox.classList.toggle('btn-check_on');
         // fakeCheckbox.classList.toggle('btn-check_off');
     }
 }
+// schedules 필드 checked 옵션 fakeCheckbox에서도 체크해주기
+function precheckSelectedSchedulesCheckbox() {
+    const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"][checked]');
+    selectedCheckboxes.forEach(input => {
+        input.previousElementSibling.classList.replace('btn-check_off', 'btn-check_on');
+    })
+}
+precheckSelectedSchedulesCheckbox();
 
 // ======================== 상품 이미지 필드 컨트롤 ========================
 // '파일 선택' 버튼 클릭시
