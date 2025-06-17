@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Sales, Products, Times, Cookies, Options, Schedules, Cakes, CakeOptions, CakeSchedules
 from .forms import ProductAdd, TimeAdd, CookieAdd, OptionAdd, ScheduleAdd, CakeAdd, TestForm
-from .modules import change_cookie_index, get_cookie_sales, match_category_from_str_to_int, get_referer, get_paginated_objects, match_type_from_str_to_int, get_cakes_sales
+from .modules import get_cookie_sales, match_category_from_str_to_int, get_referer, get_paginated_objects, match_type_from_str_to_int, get_cakes_sales, change_index
 
 
 def cookies(request, category='all'):
@@ -96,19 +96,10 @@ def cookies_pickups_add(request):
 def change_cookies_index(request, idx, action):
     referer = get_referer(request, 'cookies')
 
-    if action == 'up':
-        target_idx = idx - 1
-        if change_cookie_index(idx, target_idx):
-            messages.success(request, '노출 순서가 변경 되었습니다.')
-        else:
-            messages.error(request, '더 이상 이동할 수 없습니다.')
-
-    elif action == 'down':
-        target_idx = idx + 1
-        if change_cookie_index(idx, target_idx):
-            messages.success(request, '노출 순서가 변경 되었습니다.')
-        else:
-            messages.error(request, '더 이상 이동할 수 없습니다.')
+    if change_index(Cookies, action, idx):
+        messages.success(request, '노출 순서가 변경 되었습니다.')
+    else:
+        messages.error(request, '더 이상 이동할 수 없습니다.')
     
     return redirect(referer)
 
@@ -319,14 +310,18 @@ def change_cakes_sales(request):
 
     return redirect(referer)
 
-# options, schedules 필드
-# 추후 options 필드도 진짜 폼 사용하도록 변경 필요
-    # 폼
-        # 가짜 폼 사용중 - 뷰에서 옵션 직접 넘겨주고, input 태그의 type과 name만 맞춰서 사용중
-        # 진짜 폼 수동 렌더링
-    # 커스텀 체크박스
-        # 뷰에서 selected_options 넘겨줌
-        # JS로 html 렌더링시 checked 속성을 갖는 input 찾아서 바꿔줌
+
+def change_cakes_index(request, idx, action):
+    referer = get_referer(request, 'cakes')
+    
+    if change_index(Cakes, action, idx):
+        messages.success(request, '노출 순서가 변경 되었습니다.')
+    else:
+        messages.error(request, '더 이상 이동할 수 없습니다.')
+        
+    return redirect(referer)
+
+
 def cakes_add_and_edit(request, pk=None):
     cake = get_object_or_404(Cakes, id=pk) if pk else None
     main_options = Options.objects.filter(type=1).order_by('price', 'name')
@@ -337,25 +332,14 @@ def cakes_add_and_edit(request, pk=None):
         sub_options[option.type].append(option)
 
     if request.method == 'POST':
-        print('포스트 요청옴')
         form = CakeAdd(request.POST, request.FILES, instance=cake)
 
         redirect_url = request.POST.get('redirect_url', '/manager/cakes/')
         if form.is_valid():
-            print('폼이 벨리드함')
-            print(form.data)
             form.save()
             messages.success(request, '성공적으로 저장 되었습니다.')
             return redirect(redirect_url)
-            # return redirect('cakes')
-        else:
-            print('폼이 벨리드 하지 않음')
-            # selected_options = list(map(int, form.data.getlist('options')))
-            print(f'폼으로 넘어온 옵션값: {selected_options}')
-            print(form.data)
-            print(form.errors)
     else:
-        print('겟 요청옴')
         form = CakeAdd(instance=cake)
         referer = get_referer(request, 'cakes')
 
@@ -412,9 +396,6 @@ def cakes_delete(request, pk):
     messages.success(request, '성공적으로 삭제 되었습니다.')
 
     return redirect(referer if request.method == 'GET' else redirect_url)
-
-
-
 
 
 def cakes_options(request, str_type='all'):
@@ -506,7 +487,6 @@ def cakes_schedules_add_and_edit(request, pk=None):
         form = ScheduleAdd(request.POST, instance=schedule)
         redirect_url = request.POST.get('redirect_url', '/manager/cakes-schedules/')
 
-
         if form.is_valid():
             form.save()
             messages.success(request, '성공적으로 저장 되었습니다.')
@@ -527,10 +507,8 @@ def cakes_schedules_add_and_edit(request, pk=None):
 
 
 def cakes_schedules_delete(request, pk):
-    # 뷰 페이지에서 삭제용 redirect url
     if request.method == 'POST':
         referer = request.POST.get('redirect_url', '/manager/cakes-schedules/')
-    # 목록 페이지에서 삭제용 redirect url
     else:
         referer = get_referer(request, 'cakes-schedules')
 

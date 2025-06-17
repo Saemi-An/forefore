@@ -15,7 +15,7 @@
           </div>
           <div class="view__sect__newbody__left__row">
             <p class="md-bold">상품 설명</p>
-            <p class="md-reg">{% if cake.cmt %}{{ cake.cmt }}{% else %}-{% endif %}</p>
+            <p class="md-reg">{% if cake.cmt %}{{ cake.cmt | linebreaksbr }}{% else %}-{% endif %}</p>
           </div>
           <div class="view__sect__newbody__left__row">
             <p class="md-bold">노출 상태</p>

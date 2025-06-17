@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from urllib.parse import urlparse
 from django.core.paginator import Paginator
 
-from .models import Cookies, Sales
+from .models import Cookies, Sales, Cakes
 
 # ==============================================================
 # *************************** 공통 ***************************
@@ -79,3 +79,17 @@ def match_type_from_str_to_int(str_type):
         return 6
     elif str_type == 'all':
         return 0
+
+def change_index(model, action, idx):
+    if action == 'up':
+        target_idx = idx - 1
+    elif action == 'down':
+        target_idx = idx + 1
+    
+    if model.objects.filter(index=target_idx):
+        model.objects.filter(index=idx).update(index=999999)
+        model.objects.filter(index=target_idx).update(index=idx)
+        model.objects.filter(index=999999).update(index=target_idx)
+        return True
+    else:
+        return False

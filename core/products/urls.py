@@ -35,6 +35,7 @@ urlpatterns = [
     path('cakes/view/<int:pk>/', login_required(views.cakes_view), name='cakes_view'),
     path('cakes/add/<int:pk>', login_required(views.cakes_add_and_edit), name='cakes_add_and_edit'),
     path('cakes/delete/<int:pk>/', login_required(views.cakes_delete), name='cakes_delete'),
+    path('cakes/<int:idx>/<str:action>/', login_required(views.change_cakes_index), name='change_cakes_index'),
     
     path('cakes-options/add/<int:pk>', login_required(views.cakes_options_add_and_edit), name='cakes_options_add'),
     path('cakes-options/view/<int:pk>/', login_required(views.cakes_options_view), name='cakes_options_view'),
