@@ -21,4 +21,4 @@ if not os.path.isabs(LOCAL_SETTINGS_PATH):
     LOCAL_SETTINGS_PATH = str(BASE_DIR / LOCAL_SETTINGS_PATH)
 
 # 다수의 설정파일을 종합 (순서 중요)
-include('base.py', 'custom.py', optional(LOCAL_SETTINGS_PATH), 'envvars.py', 'docker.py')
+include('base.py', 'logging.py', 'custom.py', optional(LOCAL_SETTINGS_PATH), 'envvars.py', 'docker.py')
