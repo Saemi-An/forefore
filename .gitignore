@@ -79,6 +79,7 @@ nosetests.xml
 
 # 운영환경용 공유 파일
 /shared
+/staticfiles
 
 # 테스트
 /test

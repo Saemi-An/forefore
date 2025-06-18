@@ -5,11 +5,6 @@ from django.contrib import admin
 from django.urls import include, path
 
 
-logger = logging.getLogger(__name__)
-logger.debug('디버깅 메세지')
-logger.info('인포 메세지')
-logger.warning('워닝 메세지')
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('core.api.urls')),

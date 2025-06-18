@@ -1,3 +1,6 @@
+from django.db.utils import OperationalError
+from django.core.exceptions import AppRegistryNotReady
+
 from datetime import date
 
 from django import forms
@@ -187,7 +190,10 @@ class CookieAdd(forms.ModelForm):
         # product 드롭다운 기본값 커스텀
             # form에 registered 값 함께 넘김 --> html에서 option 값만 수동 렌더링
         self.fields['product'].empty_label = '선택해 주세요.'
-        used_ids = set(Cookies.objects.values_list('product_id', flat=True))
+        try:
+            used_ids = set(Cookies.objects.values_list('product_id', flat=True))
+        except(OperationalError, AppRegistryNotReady):
+            used_ids = set()
         self.registered = used_ids
 
         # status 드롭다운 기본값 커스텀
@@ -203,7 +209,10 @@ class CookieAdd(forms.ModelForm):
         self.fields['safe'].required = False
 
         # 구움과자 판매상태
-        sales = Sales.objects.get(id=1).on_sale
+        try:
+            sales = Sales.objects.get(id=1).on_sale
+        except(OperationalError, AppRegistryNotReady):
+            sales = False
 
         if sales:
             self.fields['status'].choices = [('', '선택해 주세요.'), (Cookies.Cookie_Status.on_sale, '판매중'), (Cookies.Cookie_Status.sold_out, '재고 소진')]
