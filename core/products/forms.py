@@ -256,10 +256,13 @@ class CakeAdd(forms.ModelForm):
             #     attrs={'class': 'visually-hidden'},
             #     choices=Options.objects.all().order_by('type', 'price', 'name')
             # ),
-            'schedules': forms.CheckboxSelectMultiple(
-                attrs={'class': 'visually-hidden'},
-                choices=Schedules.objects.all().order_by('name', 'start_date', 'start_time')
-            )
+            # 'schedules': forms.CheckboxSelectMultiple(
+            #     attrs={'class': 'visually-hidden'},
+            #     choices=Schedules.objects.all().order_by('name', 'start_date', 'start_time')
+            # )
+            'schedules': forms.CheckboxSelectMultiple(attrs={
+                'class': 'visually-hidden'
+            },)
         }       
 
     # 커스텀
@@ -276,6 +279,9 @@ class CakeAdd(forms.ModelForm):
         display_choices = self.fields['display'].choices
         if display_choices and display_choices[0][0] == '':
             self.fields['display'].choices = [('', '선택해 주세요.')] + list(display_choices[1:])
+        
+        # schedules choices 설정
+        self.fields['schedules'].choices = Schedules.objects.all().order_by('name', 'start_date', 'start_time')
 
     # 유효성 검사
     def clean(self):
